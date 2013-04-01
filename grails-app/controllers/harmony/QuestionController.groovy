@@ -1,12 +1,19 @@
 package harmony
 
 import org.springframework.dao.DataIntegrityViolationException
-import grails.converters.JSON
+
 import com.google.gson.Gson
-import grails.converters.XML
+
+import org.apache.shiro.authz.annotation.RequiresPermissions
+import com.harmony.graph.Question
+import com.orientechnologies.common.reflection.OReflectionHelper
 
 
 class QuestionController {
+
+    def skillsService
+    def questionImportService
+    def orientDBService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -14,37 +21,23 @@ class QuestionController {
         redirect(action: "list", params: params)
     }
 
-    def list(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        //render(view: "questionList")
-        //return Question.all as JSON
-        [questionInstanceList: Question.list(params), questionInstanceTotal: Question.count()]
-    }
-
+    @RequiresPermissions('ADD_QUESTION_PERMISSION')
     def showQuestionList(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         render(view: "questionListDataTable")
-        //return Question.all as JSON
-        //[questionInstanceList: Question.list(params), questionInstanceTotal: Question.count()]
     }
 
-    def listQuestions(){
-        //String json = Question.all as JSON
-        Question newQuestion = new Question()
-        newQuestion.text = "hello"
+    def listQuestions(String tagName){
         QuestionResult questionResult = new QuestionResult()
-        def questionList = new ArrayList()
-        questionList.add(newQuestion)
-        questionResult.Records = Question.all
-        questionResult.Records = questionList
-        questionResult.Result = "OK"
-        questionResult.data = questionResult.Records
+        def questionsList = orientDBService.getQuestions(tagName)
+        List<QuestionDto> questionDtoList = new ArrayList<QuestionDto>()
+        for (Question question in questionsList){
+            questionDtoList.add(QuestionDto.build(question))
+        }
+        questionResult.data = questionDtoList
         questionResult.curPage = 1
-        questionResult.totalRecords = questionResult.Records.size()
-
+        questionResult.totalRecords = questionDtoList.size()
         String json = new Gson().toJson(questionResult)
-
-        http://www.jqwidgets.com/jquery-widgets-documentation/documentation/jqxbutton/jquery-button-api.htm
         render json
     }
 
@@ -59,7 +52,11 @@ class QuestionController {
         questionInstance.option3 = params['option3']
         questionInstance.option4 = params['option4']
         questionInstance.option5 = params['option5']
-        questionInstance.answer1 = params['answer']
+        questionInstance.choice1 = params['choice1']
+        questionInstance.choice2 = params['choice2']
+        questionInstance.choice3 = params['choice3']
+        questionInstance.choice4 = params['choice4']
+        questionInstance.choice5 = params['choice5']
 
         questionInstance.questionType = "MCQ"
         questionInstance.marks = 1
@@ -72,68 +69,61 @@ class QuestionController {
                 QuestionResult questionResult = new QuestionResult()
         def questionList = new ArrayList()
         questionList.add(questionInstance)
-        questionResult.Records = questionList
-        questionResult.Result = "OK"
 
         String json = new Gson().toJson(questionResult)
+        questionInstance.save(flush: true)
 
-        if (!questionInstance.save(flush: true)) {
-            questionResult.Result = "ERROR"
-        }
         questionResult.data = questionList
         questionResult.curPage = 1
         questionResult.totalRecords = questionList.count()
         render json
     }
 
-    def show(Long id) {
-        def questionInstance = Question.get(id)
-        if (!questionInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'question.label', default: 'Question'), id])
-            redirect(action: "list")
-            return
-        }
-        [questionInstance: questionInstance]
+    def showBulkUpload(){
+        render view:  "bulkUpload", model: [skills : skillsService.getAllSubjects()]
     }
 
-    def edit(Long id) {
-        def questionInstance = Question.get(id)
-        if (!questionInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'question.label', default: 'Question'), id])
-            redirect(action: "list")
-            return
-        }
-        [questionInstance: questionInstance]
-    }
-
-    def update(Long id, Long version) {
-        def questionInstance = Question.get(id)
-    }
-
-    def delete(Long id) {
-        def questionInstance = Question.get(id)
-        if (!questionInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'question.label', default: 'Question'), id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            questionInstance.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'question.label', default: 'Question'), id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'question.label', default: 'Question'), id])
-            redirect(action: "show", id: id)
-        }
+    def bulkUpload(){
+        //def classes = OReflectionHelper.getClassesForPackage()
+        def userFile = params['questionsFile']
+        questionImportService.uploadQuestions(userFile)
     }
 
     class QuestionResult implements Serializable{
         def totalRecords
         def curPage
         def data
-        def Result = "OK"
-        def Records
+    }
+}
+
+class QuestionDto{
+    String text;
+    String option1;
+    String option2;
+    String option3;
+    String option4;
+    String option5;
+    //Order does not matter in choices
+    List<String> choices;
+
+    String questionType;
+    String companyShortName;
+    //Marks associated with question
+    Integer marks;
+    //Who uploaded this question
+    Long userId;
+    List<String> tags;
+    boolean isDirty = false
+
+    static build(Question question){
+        QuestionDto questionDto = new QuestionDto()
+        questionDto.text = question.text
+        questionDto.option1 = question.option1
+        questionDto.option2 = question.option2
+        questionDto.option3 = question.option3
+        questionDto.option4 = question.option4
+        questionDto.option5 = question.option5
+        questionDto.questionType = question.questionType
+        return questionDto
     }
 }

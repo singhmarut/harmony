@@ -1,9 +1,7 @@
 package harmony
 
-
-
-import org.junit.*
 import grails.test.mixin.*
+import com.harmony.graph.Question
 
 @TestFor(QuestionController)
 @Mock(Question)

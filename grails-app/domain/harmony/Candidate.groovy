@@ -7,7 +7,7 @@ class Candidate implements Serializable {
     String lastName
     Integer phoneNumber
 
-    static hasMany = [comapany: Company, answerSheets: AnswerSheet]
+    static hasMany = [comapany: Company]
     static belongsTo = [Company]
 
     static constraints = {

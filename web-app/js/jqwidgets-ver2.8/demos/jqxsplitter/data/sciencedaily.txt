@@ -63,7 +63,7 @@
           }
         },
         {
-          "title": "Three key questions for the IT industry",
+          "title": "Three key questionsIds for the IT industry",
           "link": "http://www.sciencedaily.com/releases/2011/10/111027082751.htm",
           "description": "Today’s multicore processors are not being utilized in a sufficiently intelligent way. They get too hot and run slowly because they are used inefficiently. At the same time, transistors are becoming so small that they will ultimately become unreliable. Major research organizations are now attempting to create a revolution in computer architecture.",
           "pubDate": "Thu, 27 Oct 2011 08:27:27 EDT",

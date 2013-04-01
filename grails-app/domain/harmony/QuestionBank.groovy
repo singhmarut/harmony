@@ -1,10 +1,10 @@
 package harmony
 
+import com.harmony.graph.Question
+
 class QuestionBank {
 
     String name
-    static hasMany = [questions: Question]
-
     static constraints = {
         name(unique: true)
     }

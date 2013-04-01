@@ -1,5 +1,8 @@
 package harmony
 
+import com.harmony.questionPaper.Section
+import com.harmony.questionPaper.QuestionPaper
+
 class QuestionPaperController {
 
     def questionPaperService
@@ -26,7 +29,7 @@ class QuestionPaperController {
         render(view: "createQuestionPaper")
     }
 
-    def createPaperStep1(){
+    def create(){
         QuestionPaper paper = questionPaperService.createDummyQuestionPaper()
         session.setAttribute("questionPaperId", paper.id)
         session.setAttribute("questionPaper", paper)

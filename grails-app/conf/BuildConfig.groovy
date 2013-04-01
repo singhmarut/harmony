@@ -17,7 +17,7 @@ grails.project.dependency.resolution = {
 
     repositories {
         inherits true // Whether to inherit repository definitions from plugins
-
+        pom (true)
         grailsPlugins()
         grailsHome()
         grailsCentral()
@@ -35,6 +35,17 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         runtime 'mysql:mysql-connector-java:5.1.20'
         build ":gson:2.2.2"
+        build ":orient-commons:1.3.0"
+        build ":orientdb-core:1.3.0"
+        build ":orientdb-client:1.3.0"
+        build ":orientdb-enterprise:1.3.0"
+        build ":orientdb-object:1.3.0"
+        build ":orientdb-graphdb:1.3.0"
+        build ":gremlin-java:2.2.0-SNAPSHOT"
+        build ":blueprints-orient-graph:2.2.0-SNAPSHOT"
+        build ":blueprints-core:2.2.0-SNAPSHOT"
+        //build "org.springframework.data:spring-mongodb:1.2.0.RELEASE"
+        build ":mongo:2.9.1"
         // runtime 'mysql:mysql-connector-java:5.1.20'
     }
 

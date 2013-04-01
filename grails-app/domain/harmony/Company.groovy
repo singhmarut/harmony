@@ -1,7 +1,5 @@
 package harmony
 
-import harmony.auth.SecUser
-
 class Company{
 
     String shortName
@@ -9,7 +7,7 @@ class Company{
     String logoPath
     Boolean isEnabled
     //static hasOne = [user: SecUser]
-    static hasMany = [answerSheets: AnswerSheet,questionPapers: QuestionPaper, candidates: Candidate, skillTags: SkillTag]
+    static hasMany = [candidates: Candidate]
 
     static constraints = {
         fullName(nullable: true)

@@ -8,7 +8,7 @@ class QuestionType {
 }
 
 enum QuestionTypeEnum{
-    MCQ,
-    MCA,
-    FIB
+    MCQ,  //Multiple Choice Questions
+    MCA,  //Multiple choice answers
+    FIB   //Fill in the blanks
 }

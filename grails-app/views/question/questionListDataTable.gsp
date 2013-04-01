@@ -7,8 +7,8 @@
     %{--<g:javascript library="jquery"/>--}%
 
     <g:javascript src="/jquery-ui/js/jquery-1.9.1.js"/>
-    <g:javascript src="/jquery-ui/js/jquery-ui-1.10.2.custom.js"/>
-    <g:javascript src="/jquery.jqGrid-4.4.4/js/jquery.jqGrid.src.js"/>
+    <g:javascript src="/jquery-ui/js/jquery-ui-1.10.2.custom.min.js"/>
+    %{--<g:javascript src="/jquery.jqGrid-4.4.4/js/jquery.jqGrid.src.js"/>--}%
 
     <g:javascript src="/jqwidgets-ver2.8/jqwidgets/jqx-all.js"/>
     %{--<g:javascript src="/jquery.jqGrid-4.4.4/js/jquery.jqGrid.src.js"/>--}%
@@ -31,7 +31,7 @@
     <script type="text/javascript">
     $(document).ready(function() {
 
-        var url = "${getRequest().contextPath}" + "/rest/url/question/list?";
+        var url =  "${createLink(controller: 'question', action: 'listQuestions')}" + "?tagName=" + "${getRequest().getParameter('tagName')}" //"${getRequest().contextPath}" + "/rest/url/question/list?" + ;
         //prepare the data
         var source =
         {
@@ -43,10 +43,9 @@
                 { name: 'option2' },
                 { name: 'option3' },
                 { name: 'option4' },
-                { name: 'answer1' },
-                { name: 'save' },
+                { name: 'option5' },
+                { name: 'isDirty' },
                 { name: 'Delete' }
-
             ],
             id: 'id',
             url: url
@@ -57,8 +56,6 @@
 
         var renderer = function (id) {
             var finalId = "btn" + id;
-            //return 'hello';
-            String
             return '<input type="button" onClick="buttonclick(event)" class="gridButton" id= "dummy" value="Delete Question" />';
         }
         var buttonclick = function (event)
@@ -88,17 +85,18 @@
                 theme: 'darkblue',
                 pageable: true,
                 autoheight: true,
-                editable: true,
+                editable: false,
                 width: 800,
                 columns: [
-                    { text: '', datafield: 'id', width: 100 },
+                    { text: '', datafield: 'id', width: 50 },
                     { text: 'Question Text', datafield: 'text', width: 100 },
-                    { text: 'Option 1', datafield: 'option1', width: 100 },
-                    { text: 'Option 2', datafield: 'option2', width: 180 },
-                    { text: 'Option 3', datafield: 'option3', width: 80, cellsalign: 'right' },
-                    { text: 'Option 4', datafield: 'option4', width: 90, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Option 1', datafield: 'option1', width: 70 },
+                    { text: 'Option 2', datafield: 'option2', width: 70 },
+                    { text: 'Option 3', datafield: 'option3', width: 70, cellsalign: 'right' },
+                    { text: 'Option 4', datafield: 'option4', width: 70, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Option 5', datafield: 'option5', width: 70, cellsalign: 'right', cellsformat: 'c2' },
                     { text: 'Answer', datafield: 'answer1', width: 100, cellsalign: 'right', cellsformat: 'c2' },
-                    { text: 'Save', datafield: 'save', width: 100,columntype: 'checkbox', cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Save', datafield: 'isDirty', width: 100,columntype: 'checkbox', cellsalign: 'right', cellsformat: 'c2' },
                     { text: 'Delete', datafield: 'Delete', width: 100,cellsrenderer: renderer, cellsalign: 'right', cellsformat: 'c2' }
                 ]
             });
@@ -108,7 +106,7 @@
 
 </head>
 <body>
-<div style="margin-bottom: 10px;">
+<div style="margin-bottom: 10px; margin-top: 20px">
     <input id="addButton" type="button" value="Add New Question" />
     <input id="removeButton" type="button" value="Delete Question" />
 </div>

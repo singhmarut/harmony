@@ -62,10 +62,12 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+        adminUploads                 = "/usr/local/prospecthire/adminUploads"
+
     }
     production {
         grails.logging.jul.usebridge = false
-        // TODO: grails.serverURL = "http://www.changeme.com"
+
     }
 }
 
@@ -88,6 +90,19 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+}
+
+grails {
+    mail {
+        host = "smtp.gmail.com"
+        port = 465
+        username = "singh.marut@gmail.com"
+        password = "richamarut2012"
+        props = ["mail.smtp.auth":"true",
+                "mail.smtp.socketFactory.port":"465",
+                "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+                "mail.smtp.socketFactory.fallback":"false"]
+    }
 }
 
 // Added by the Spring Security Core plugin:

@@ -1,19 +1,46 @@
 package harmony
 
+import com.harmony.questionPaper.Section
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import com.harmony.questionPaper.QuestionPaper
+import com.harmony.graph.Question
+import com.google.gson.Gson
+
 class QuestionPaperService {
 
-    def createQuestionPaper(String instruction, List<Section> sections, String companyName){
-        QuestionPaper paper = QuestionPaper.create()
-        paper.instruction = instruction
-        paper.sections = sections
-        paper.company = Company.findByShortName(companyName)
-        paper.save()
+    def mongoTemplate
+    def mongoCollectionFactoryService
+
+    def createQuestionPaper(String questionPaperJson){
+       QuestionPaper questionPaper = new Gson().fromJson(questionPaperJson, QuestionPaper.class)
     }
 
     def createDummyQuestionPaper(){
-        QuestionPaper paper = new QuestionPaper()
-        paper = paper.save(flush: true)
-        return paper
+
+    }
+    /**
+     * returns list of all questions papers for a company
+     * @param companyId
+     * @return
+     */
+    def findByCompany(long companyId){
+        String coll = mongoCollectionFactoryService.getQuestionPaperCollName(companyId)
+        return mongoTemplate.findAll(QuestionPaper.class, coll)
+    }
+
+    def findById(long companyId, long id){
+       String coll = mongoCollectionFactoryService.getQuestionPaperCollName(companyId)
+       return mongoTemplate.findOne(new Query(Criteria.where("questionPaperId").is(id)), QuestionPaper.class, coll)
+    }
+
+    def getAllQuestionsForQuestionPaper(long companyId, long questionPaperId){
+        QuestionPaper questionPaper = findById(companyId, questionPaperId)
+        List<Question> questionList = new ArrayList<Question>()
+        for (Section section in questionPaper.sectionList){
+            questionList.addAll(section.getQuestionList())
+        }
+        return questionList
     }
 
     def serviceMethod() {

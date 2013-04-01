@@ -16,7 +16,7 @@
 
 <g:form>
     <g:each in="${questionPaper.sections}" var="section">
-       <g:each in="${section.questions}" var="question">
+       <g:each in="${section.questionsIds}" var="question">
            <div id="questionText" align="left">
                 <table>
                     <tr>

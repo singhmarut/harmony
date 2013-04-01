@@ -11,6 +11,7 @@ import com.harmony.shiro.auth.Role
 
 class AdminController {
     def shiroSecurityService
+    def mailService
 
     @RequiresPermissions("ADD_USER_PERMISSION")
     def createUserAccount(){
@@ -18,10 +19,19 @@ class AdminController {
         def companyRole = Role.findByName('ROLE_COMPANY') ?:
             new Role(name: 'ROLE_COMPANY').save(flush: true)
         User user = new Gson().fromJson(params['user'],User.class)
-        user.enabled = true
-        user.lastName = user.firstName
         user.passwordHash = shiroSecurityService.encodePassword("admin")
+        user.addToRoles(companyRole)
         def createdUser = user.save(flush:  true)
+        try{
+            mailService.sendMail {
+                to user.username
+                subject "Prospect Hire account created"
+                text """Congratulations!! Your account on prospect hire has been successfully created.
+                        Please click on this link to active your account """
+            }
+        }catch(Exception ex){
+            log.error("Unable to account confirmation email to user ")
+        }
 
         render new Gson().toJson(createdUser)
     }
