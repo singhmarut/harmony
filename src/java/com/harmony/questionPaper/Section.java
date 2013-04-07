@@ -75,6 +75,8 @@ class SectionSubject{
     @Transient
     List<Question> questions;
 
+    long subjectTagId;
+
     //Difficulty Level of questionsIds 1 - 10
     int difficultyLevel;
     //Number of questionsIds to be shown during test
@@ -110,5 +112,13 @@ class SectionSubject{
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public long getSubjectTagId() {
+        return subjectTagId;
+    }
+
+    public void setSubjectTagId(long subjectTagId) {
+        this.subjectTagId = subjectTagId;
     }
 }

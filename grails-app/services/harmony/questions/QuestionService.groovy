@@ -9,11 +9,20 @@ class QuestionService {
     def mongoTemplate
     def mongoCollectionFactoryService
 
-    def findQuestions(int companyId, List<String> questionIds){
-        String coll = mongoCollectionFactoryService.getQuestionPaperCollName(companyId)
+    def findQuestions(long companyId, List<Long> questionIds){
+        String coll = mongoCollectionFactoryService.getQuestionsCollName(companyId)
 
-        List<Question> questionList = mongoTemplate.find(new Query(Criteria.where("questionId").in(questionIds)), Question.class, coll)
+        List<Question> questions = new ArrayList<Question>()
+        for (Long questionId : questionIds){
+            Question question = mongoTemplate.findOne(new Query(Criteria.where("questionId").is(questionId)), Question.class, coll)
+            questions.add(question)
+        }
 
-        return questionList
+
+        return questions
+    }
+
+    def findQuestions(long companyId, long subjectId){
+        mongoTemplate.find(new Query(Criteria.where("")))
     }
 }

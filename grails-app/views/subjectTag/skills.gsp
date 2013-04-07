@@ -48,6 +48,13 @@
             $("#dialog-form").dialog("open");
         });
 
+        $('#showQuestions').bind('click', function(item){
+
+            var selectedSubject = $('#tt').tree('getSelected');
+            var url = "${createLink(controller: 'question', action: 'showQuestionList')}" + "?tagName=" + selectedSubject.text;
+            window.open(url,'Questions', { height: 300, width: 300 });
+        });
+
         $('#cancelSubject').bind('click', function(e){
             $("#dialog-form").dialog("close");
         });
@@ -63,13 +70,29 @@
             $.ajax({
                 url: createUrl,
                 dataType: "json",
-                tyoe: "POST",
+                type: "POST",
                 data: {so: JSON.stringify(subject)}
+            }).done(function(){
+                        $("#dialog-form").dialog("close");
+            }).error(function(){
+                        $("#dialog-form").dialog("close");
+                        alert('Unable to create subject. Please try again');
             })
         });
         $('#tt').tree({
             onClick: function(node){
                 //alert(node.text);  // alert node text property when clicked
+            },
+            onContextMenu: function(e, node){
+                e.preventDefault();
+                // select the node
+                $('#tt').tree('select', node.target);
+                // display context menu
+                $('#mm').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY,
+                    text: node.text
+                });
             }
         });
     });
@@ -99,9 +122,6 @@
         %{--</div>--}%
     %{--</form>--}%
 %{--</div>--}%
-
-
-
 <div id="dialog-form" closed="true" title="Create new Subject">
     <p class="validateTips">All form fields are required.</p>
     <form id="fm" method="post">
@@ -116,7 +136,13 @@
         </div>
     </form>
 </div>
-<ul id="tt" class="easyui-tree" data-options="url:'${createLink(controller: 'subjectTag', action: 'list')}',animate:false,checkbox:true"></ul>
+
+%{--Context Menu --}%
+<div id="mm" class="easyui-menu" style="width:120px;">
+    <div id="showQuestions" data-options="iconCls:'icon-search'">Show Questions</div>
+</div>
+
+<ul id="tt" class="easyui-tree" data-options="url:'${createLink(controller: 'subjectTag', action: 'list')}',animate:false"></ul>
 %{--<ul id="tt" class="easyui-tree" animate="true" cascadeCheck="true" checkbox="true" lines ="true" url="">--}%
 %{--</ul>--}%
 </body>

@@ -13,7 +13,7 @@ class QuestionController {
 
     def skillsService
     def questionImportService
-    def orientDBService
+    def hyperService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -23,21 +23,21 @@ class QuestionController {
 
     @RequiresPermissions('ADD_QUESTION_PERMISSION')
     def showQuestionList(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        render(view: "questionListDataTable")
+        render(view: "questionListDataTable", model: [tagName: params['tagName']])
     }
 
     def listQuestions(String tagName){
         QuestionResult questionResult = new QuestionResult()
-        def questionsList = orientDBService.getQuestions(tagName)
+        long companyId = 1
+        def questionsList = hyperService.getQuestions(tagName,companyId)
         List<QuestionDto> questionDtoList = new ArrayList<QuestionDto>()
         for (Question question in questionsList){
             questionDtoList.add(QuestionDto.build(question))
         }
-        questionResult.data = questionDtoList
+        questionResult.data = questionsList
         questionResult.curPage = 1
-        questionResult.totalRecords = questionDtoList.size()
-        String json = new Gson().toJson(questionResult)
+        questionResult.totalRecords = questionsList.size()
+        String json = new Gson().toJson(questionsList)
         render json
     }
 
@@ -45,23 +45,23 @@ class QuestionController {
         [questionInstance: new Question(params)]
     }
 
-    def updateQuestionProps(Question questionInstance){
-        questionInstance.text = params['text']
-        questionInstance.option1 = params['option1']
-        questionInstance.option2 = params['option2']
-        questionInstance.option3 = params['option3']
-        questionInstance.option4 = params['option4']
-        questionInstance.option5 = params['option5']
-        questionInstance.choice1 = params['choice1']
-        questionInstance.choice2 = params['choice2']
-        questionInstance.choice3 = params['choice3']
-        questionInstance.choice4 = params['choice4']
-        questionInstance.choice5 = params['choice5']
-
-        questionInstance.questionType = "MCQ"
-        questionInstance.marks = 1
-        return questionInstance
-    }
+//    def updateQuestionProps(Question questionInstance){
+//        questionInstance.text = params['text']
+//        questionInstance.option1 = params['option1']
+//        questionInstance.option2 = params['option2']
+//        questionInstance.option3 = params['option3']
+//        questionInstance.option4 = params['option4']
+//        questionInstance.option5 = params['option5']
+//        questionInstance.choice1 = params['choice1']
+//        questionInstance.choice2 = params['choice2']
+//        questionInstance.choice3 = params['choice3']
+//        questionInstance.choice4 = params['choice4']
+//        questionInstance.choice5 = params['choice5']
+//
+//        questionInstance.questionType = "MCQ"
+//        questionInstance.marks = 1
+//        return questionInstance
+//    }
 
     def save() {
         def questionInstance = new Question()
@@ -80,7 +80,7 @@ class QuestionController {
     }
 
     def showBulkUpload(){
-        render view:  "bulkUpload", model: [skills : skillsService.getAllSubjects()]
+        render view:  "bulkUpload"
     }
 
     def bulkUpload(){

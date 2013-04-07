@@ -33,40 +33,67 @@
     <table name="company" schema="" catalog="adaptiveTester" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
       <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
-      <column name="full_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="logo_path" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="full_name" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <column name="logo_path" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
       <column name="short_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="is_enabled" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
       <primary-key name="PRIMARY" columns="id" />
     </table>
     <table name="company_answer_sheet" schema="" catalog="adaptiveTester" type="TABLE">
       <column name="company_answer_sheets_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
       <column name="answer_sheet_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <foreign-key name="FKD645DA20A250D9FC" columns="company_answer_sheets_id" ref-table="sec_user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
       <foreign-key name="FKD645DA20A8B41E95" columns="answer_sheet_id" ref-table="answer_sheet" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
-      <foreign-key name="FKD645DA20A250D9FC" columns="company_answer_sheets_id" ref-table="company" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
     </table>
     <table name="company_candidates" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="company_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" def="MA==" />
       <column name="candidate_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
-      <column name="company_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
       <primary-key name="PRIMARY" columns="company_id,candidate_id" />
       <foreign-key name="FKFA38745238A61BD2" columns="candidate_id" ref-table="candidate" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
-      <foreign-key name="FKFA3874524208DF92" columns="company_id" ref-table="company" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FKFA3874524208DF92" columns="company_id" ref-table="sec_user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+    </table>
+    <table name="pending_email_confirmation" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="confirmation_event" sqlType="VARCHAR" length="80" precision="0" nullable="true" jdbcType="12" />
+      <column name="confirmation_token" sqlType="VARCHAR" length="80" precision="0" nullable="false" jdbcType="12" />
+      <column name="email_address" sqlType="VARCHAR" length="80" precision="0" nullable="false" jdbcType="12" />
+      <column name="timestamp" sqlType="DATETIME" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="user_token" sqlType="LONGTEXT" length="2147483647" precision="0" nullable="true" jdbcType="-1" />
+      <primary-key name="PRIMARY" columns="id" />
+      <index name="emailconf_timestamp_Idx" unique="false" columns="timestamp" />
+      <index name="emailconf_token_Idx" unique="false" columns="confirmation_token" />
+    </table>
+    <table name="permissions" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="permission" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="id" />
     </table>
     <table name="question" schema="" catalog="adaptiveTester" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
       <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
-      <column name="answer1" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="answer2" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="answer3" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="answer4" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="answer5" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="company_short_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="answer1" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="answer2" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="answer3" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="answer4" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="answer5" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="company_short_name" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <column name="marks" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
       <column name="option1" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <column name="option2" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <column name="option3" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <column name="option4" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <column name="option5" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
-      <column name="question_type" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="question_type" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
       <column name="text" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="tags" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="choice1" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="choice2" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="choice3" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="choice4" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="choice5" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="user_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
       <primary-key name="PRIMARY" columns="id" />
     </table>
     <table name="question_bank" schema="" catalog="adaptiveTester" type="TABLE">
@@ -86,16 +113,77 @@
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
       <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
       <column name="active" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
-      <column name="company_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
-      <column name="instruction" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="company_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="instruction" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
       <primary-key name="PRIMARY" columns="id" />
-      <foreign-key name="FK8FF7ABF34208DF92" columns="company_id" ref-table="company" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FK8FF7ABF34208DF92" columns="company_id" ref-table="sec_user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+    </table>
+    <table name="question_skill_tag" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="question_tags_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="skill_tag_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <foreign-key name="FK98A237933F7A3796" columns="question_tags_id" ref-table="question" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FK98A237937018CD1F" columns="skill_tag_id" ref-table="skill_tag" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+    </table>
+    <table name="question_subject_tag" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="question_tags_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="subject_tag_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <foreign-key name="FK3AB6BF2E3F7A3796" columns="question_tags_id" ref-table="question" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FK3AB6BF2E8CC24729" columns="subject_tag_id" ref-table="subject_tag" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
     </table>
     <table name="question_type" schema="" catalog="adaptiveTester" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
       <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
       <column name="question_type_enum" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <primary-key name="PRIMARY" columns="id" />
+    </table>
+    <table name="registration_code" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="date_created" sqlType="DATETIME" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="token" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="username" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="id" />
+    </table>
+    <table name="role" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="id" />
+      <index name="name" unique="true" columns="name" />
+    </table>
+    <table name="role_permissions" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="role_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="permissions_string" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <foreign-key name="FKEAD9D23BA896DC8E" columns="role_id" ref-table="role" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+    </table>
+    <table name="sec_role" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="authority" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="id" />
+      <index name="authority" unique="true" columns="authority" />
+    </table>
+    <table name="sec_user" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="account_expired" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="account_locked" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="enabled" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="password" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="password_expired" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="username" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="class" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="full_name" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <column name="logo_path" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <column name="short_name" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="id" />
+      <index name="username" unique="true" columns="username" />
+    </table>
+    <table name="sec_user_sec_role" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="sec_role_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="sec_user_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="PRIMARY" columns="sec_role_id,sec_user_id" />
+      <foreign-key name="FK6630E2A7570055F" columns="sec_user_id" ref-table="sec_user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FK6630E2AD045417F" columns="sec_role_id" ref-table="sec_role" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
     </table>
     <table name="section" schema="" catalog="adaptiveTester" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
@@ -117,6 +205,15 @@
     <table name="skill_tag" schema="" catalog="adaptiveTester" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
       <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="company_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="skill_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="id" />
+      <foreign-key name="FK76B428AC4208DF92" columns="company_id" ref-table="sec_user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+    </table>
+    <table name="subject_tag" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="company_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <column name="skill_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <primary-key name="PRIMARY" columns="id" />
     </table>
@@ -126,6 +223,31 @@
       <column name="question_paper_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
       <column name="test_key" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
       <primary-key name="PRIMARY" columns="id" />
+    </table>
+    <table name="user" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
+      <column name="version" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="password_hash" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="username" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="first_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="last_name" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="enabled" sqlType="BIT" length="1" precision="0" nullable="false" jdbcType="-7" />
+      <column name="company" sqlType="VARCHAR" length="255" precision="0" nullable="false" jdbcType="12" />
+      <column name="phone_number" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <primary-key name="PRIMARY" columns="id" />
+      <index name="username" unique="true" columns="username" />
+    </table>
+    <table name="user_permissions" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="user_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
+      <column name="permissions_string" sqlType="VARCHAR" length="255" precision="0" nullable="true" jdbcType="12" />
+      <foreign-key name="FKE693E6104DC1A06E" columns="user_id" ref-table="user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+    </table>
+    <table name="user_roles" schema="" catalog="adaptiveTester" type="TABLE">
+      <column name="role_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <column name="user_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" />
+      <primary-key name="PRIMARY" columns="user_id,role_id" />
+      <foreign-key name="FK734299494DC1A06E" columns="user_id" ref-table="user" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FK73429949A896DC8E" columns="role_id" ref-table="role" ref-schema="" ref-catalog="adaptiveTester" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
     </table>
     <table name="answer_sheet" schema="" catalog="archtest" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />
@@ -154,8 +276,8 @@
     <table name="candidate_answer_sheet" schema="" catalog="archtest" type="TABLE">
       <column name="candidate_answer_sheets_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
       <column name="answer_sheet_id" sqlType="BIGINT" length="19" precision="0" nullable="true" jdbcType="-5" />
-      <foreign-key name="FK5B26DADAA8B41E95" columns="answer_sheet_id" ref-table="answer_sheet" ref-schema="" ref-catalog="archtest" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
       <foreign-key name="FK5B26DADA64FE68BC" columns="candidate_answer_sheets_id" ref-table="candidate" ref-schema="" ref-catalog="archtest" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
+      <foreign-key name="FK5B26DADAA8B41E95" columns="answer_sheet_id" ref-table="answer_sheet" ref-schema="" ref-catalog="archtest" ref-columns="id" update-rule="3" delete-rule="3" deferrability="2" />
     </table>
     <table name="company" schema="" catalog="archtest" type="TABLE">
       <column name="id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true" />

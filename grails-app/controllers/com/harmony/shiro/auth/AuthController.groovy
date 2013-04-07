@@ -6,9 +6,15 @@ import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.web.util.SavedRequest
 import org.apache.shiro.web.util.WebUtils
 import org.apache.shiro.grails.ConfigUtils
+import org.apache.shiro.subject.Subject
+import com.google.gson.Gson
+import grails.converters.JSON
 
 class AuthController {
     def shiroSecurityManager
+    def testKeyGeneratorService
+    def shiroSecurityService
+    def harmonyMailService
 
     def index = { redirect(action: "login", params: params) }
 
@@ -36,10 +42,14 @@ class AuthController {
         }
         
         try{
+            User user = User.findByUsername(params.username)
             // Perform the actual login. An AuthenticationException
             // will be thrown if the username is unrecognised or the
             // password is incorrect.
             SecurityUtils.subject.login(authToken)
+            if (user){
+                SecurityUtils.subject.session.setAttribute("userId", user.id)
+            }
 
             log.info "Redirecting to '${targetUri}'."
             redirect(uri: targetUri)
@@ -83,4 +93,64 @@ class AuthController {
     def unauthorized = {
         render "You do not have permission to access this page."
     }
+
+    def authorizeKey= {
+        String authKey = params.authKey
+        if (!testKeyGeneratorService.findQuestionPaper(authKey) ){
+            flash.message = "Wrong Authroization Key. Please try again"
+            render view: "login"
+        }else{
+            User user = User.findByUsername(params.email)
+            if (!user){
+                user = createNewCandidate(params.email)
+            }
+            /**
+             * At the time of test load we will login user as guest only
+             */
+            UsernamePasswordToken token = new UsernamePasswordToken("guest", "admin");
+            Subject currentUser = SecurityUtils.getSubject();
+            SecurityUtils.subject.login(token)
+            params.username = "guest"
+            params.password = "admin"
+            currentUser.session.setAttribute("authKey", authKey)
+            registerCandidate(user)
+            flash.message = ""
+            redirect(controller: 'questionPaper', action: 'loadQuestionPaper')
+            //redirect(action: "signIn", params: params)
+        }
+    }
+
+    def createNewCandidate(String email){
+        Role role = Role.findByName("ROLE_CANDIDATE")
+        //Create a new user and bind this Test Key to this user
+        //currentUser.session.setAttribute("authKey", authKey)
+        User user  = new User()
+        user.username = params.email
+        String password = testKeyGeneratorService.createPasswordForCandidate()
+        user.passwordHash = shiroSecurityService.encodePassword(password)
+        user.addToRoles(role)
+        user = user.save(flush: true)
+        harmonyMailService.sendCandidateAccountCreationMail(user,password)
+        return user
+    }
+
+    def registerCandidate(User user){
+        Subject currentUser = SecurityUtils.getSubject()
+        if (currentUser)
+        {
+            def authKey = currentUser.session.getAttribute("authKey")
+            testKeyGeneratorService.bindAuthKeyWithCandidate(authKey, user.id)
+
+        }
+    }
+}
+
+class UserDto{
+    String email
+    String password
+}
+
+class HarmonyResponse{
+    int status
+    String message
 }

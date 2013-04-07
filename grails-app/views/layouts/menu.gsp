@@ -33,10 +33,16 @@
         <a href="${createLink(controller: 'auth')}">Login</a>
     </shiro:isNotLoggedIn>
 
+
+
     <shiro:isLoggedIn>
+        <shiro:hasAnyRole in="['ROLE_ADMIN','ROLE_CANDIDATE']">
         Welcome <shiro:principal/>
         <a href="${createLink(controller: 'auth', action: 'signOut')}">Logout</a>
+        </shiro:hasAnyRole>
     </shiro:isLoggedIn>
+
+
     <r:layoutResources />
 
 </head>
@@ -63,6 +69,7 @@
                     <ul>
                         <li><a href="${createLink(controller: 'subjectTag', action:'index')}">Manage Subjects</a></li>
                         <li><a href="${createLink(controller: 'question', action:'showQuestionList')}">Manage Tags</a></li>
+                        <li><a href="${createLink(controller: 'question', action:'showBulkUpload')}">Upload Questions</a></li>
                     </ul>
                 </li>
                 </shiro:hasPermission>
@@ -79,7 +86,8 @@
                 <li>Question Paper
                     <ul>
                         <li><a href="${createLink(controller: 'admin', action:'index')}">Manage Templates</a></li>
-                    <li><a href="${createLink(controller: 'questionPaper', action:'createPaper')}">Create Question Paper</a></li>
+                        <li><a href="${createLink(controller: 'questionPaper', action:'createPaper')}">Create Question Paper</a></li>
+                        <li><a href="${createLink(controller: 'questionPaper', action:'showQuestionPapers')}">Show Question Papers</a></li>
                     </ul>
                 </li>
                 <li>Admin

@@ -31,7 +31,7 @@
     <script type="text/javascript">
     $(document).ready(function() {
 
-        var url =  "${createLink(controller: 'question', action: 'listQuestions')}" + "?tagName=" + "${getRequest().getParameter('tagName')}" //"${getRequest().contextPath}" + "/rest/url/question/list?" + ;
+        var url =   "${createLink(controller: 'question', action: 'listQuestions')}" + "?tagName=" + "${getRequest().getParameter('tagName')}" //"${getRequest().contextPath}" + "/rest/url/question/list?" + ;
         //prepare the data
         var source =
         {
@@ -44,6 +44,12 @@
                 { name: 'option3' },
                 { name: 'option4' },
                 { name: 'option5' },
+                { name: 'choice1' },
+                { name: 'choice2' },
+                { name: 'choice3' },
+                { name: 'choice4' },
+                { name: 'choice5' },
+                { name: 'difficultyLevel' },
                 { name: 'isDirty' },
                 { name: 'Delete' }
             ],
@@ -95,7 +101,12 @@
                     { text: 'Option 3', datafield: 'option3', width: 70, cellsalign: 'right' },
                     { text: 'Option 4', datafield: 'option4', width: 70, cellsalign: 'right', cellsformat: 'c2' },
                     { text: 'Option 5', datafield: 'option5', width: 70, cellsalign: 'right', cellsformat: 'c2' },
-                    { text: 'Answer', datafield: 'answer1', width: 100, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Choice 1', datafield: 'choice1', columntype: 'checkbox', width: 70, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Choice 2', datafield: 'choice2', columntype: 'checkbox',width: 70, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Choice 3', datafield: 'choice3', columntype: 'checkbox',width: 70, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Choice 4', datafield: 'choice4', columntype: 'checkbox',width: 70, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Choice 5', datafield: 'choice5', columntype: 'checkbox',width: 70, cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Difficulty Level', datafield: 'difficultyLevel', width: 70, cellsalign: 'right', cellsformat: 'c2' },
                     { text: 'Save', datafield: 'isDirty', width: 100,columntype: 'checkbox', cellsalign: 'right', cellsformat: 'c2' },
                     { text: 'Delete', datafield: 'Delete', width: 100,cellsrenderer: renderer, cellsalign: 'right', cellsformat: 'c2' }
                 ]

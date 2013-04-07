@@ -30,7 +30,7 @@ class AdminController {
                         Please click on this link to active your account """
             }
         }catch(Exception ex){
-            log.error("Unable to account confirmation email to user ")
+            log.error("Unable to send account confirmation email to user ")
         }
 
         render new Gson().toJson(createdUser)

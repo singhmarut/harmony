@@ -12,7 +12,7 @@ grails.project.dependency.resolution = {
         // specify dependency exclusions here; for example, uncomment this to disable ehcache:
         // excludes 'ehcache'
     }
-    log "error" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     checksums true // Whether to verify checksums on resolve
 
     repositories {
@@ -44,6 +44,11 @@ grails.project.dependency.resolution = {
         build ":gremlin-java:2.2.0-SNAPSHOT"
         build ":blueprints-orient-graph:2.2.0-SNAPSHOT"
         build ":blueprints-core:2.2.0-SNAPSHOT"
+        build ":hgbdbje:1.2"
+        build ":hgdb:1.2"
+        build ":je:5.0.34"
+        runtime ":gremlin-java:2.2.0-SNAPSHOT"
+        runtime ":gremlin-groovy:2.2.0-SNAPSHOT"
         //build "org.springframework.data:spring-mongodb:1.2.0.RELEASE"
         build ":mongo:2.9.1"
         // runtime 'mysql:mysql-connector-java:5.1.20'

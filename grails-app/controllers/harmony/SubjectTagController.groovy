@@ -2,7 +2,7 @@ package harmony
 
 import com.google.gson.Gson
 import org.apache.shiro.SecurityUtils
-import grails.converters.JSON
+
 import com.harmony.graph.SubjectTag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -39,7 +39,7 @@ class SubjectTagController {
             SubjectDto subjectDto = new SubjectDto()
             subjectDto.company = subjectTag.companyId
             subjectDto.text = subjectTag.subjectName
-            subjectDto.id = subjectTag.nodeId
+            subjectDto.id = subjectTag.skillId
             allSubjects.add(subjectDto)
         }
 
@@ -61,7 +61,7 @@ class SubjectTagController {
         List<String> skillTags = new ArrayList<String>()
 
         SubjectTag createdTag =  skillsService.createNewSubject(subjectDto.text, subjectDto.parentSkill)
-        subjectDto.id = createdTag.nodeId
+        subjectDto.id = createdTag.skillId
         //Just a dummy response
 //        SkillResult skillResult = new SkillResult()
 //        skillResult.data = skillTags

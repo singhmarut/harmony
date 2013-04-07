@@ -6,6 +6,8 @@ import harmony.QuestionPaperService
 import org.apache.commons.lang.RandomStringUtils
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.apache.shiro.SecurityUtils
+import org.springframework.data.mongodb.core.query.Update
 
 
 class TestKeyGeneratorService {
@@ -14,61 +16,82 @@ class TestKeyGeneratorService {
     def questionPaperService
     def mongoCollectionFactoryService
 
-    def createKey(long companyId, long questionPaperId){
+    def generateKeys(long companyId, long questionPaperId, int keyCount){
 
+        def principal = SecurityUtils.subject?.principal
         QuestionPaper questionPaper = questionPaperService.findById(companyId, questionPaperId)
         TestKey testKey = new TestKey()
-        testKey.customerId = questionPaper.getCompanyId()
+        testKey.customerId = companyId
         testKey.questionPaper = questionPaper
-        testKey.questionPaperId =  questionPaper.getCompanyId()
+        testKey.questionPaperId =  questionPaperId
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
-        String randomKey = getTestKey()
-        //Save test key if it does not exist already
-        def findTestKey = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(randomKey)), TestKey.class, coll)
-        int counter = 0
-        while (findTestKey && counter < 10){
-            randomKey = getTestKey()
-            findTestKey = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(randomKey)), TestKey.class, coll)
-            counter++
+
+        while(keyCount >= 0){
+            String randomKey = getTestKey()
+            //Save test key if it does not exist already
+            def findTestKey = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(randomKey)), TestKey.class, coll)
+            int counter = 0
+            while (findTestKey && counter < 10){
+                randomKey = getTestKey()
+                findTestKey = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(randomKey)), TestKey.class, coll)
+                counter++
+            }
+            if (findTestKey){
+                log.error("Unable to generate random key for questionPaper" + questionPaperId.toString())
+            }else{
+                testKey.authKey = randomKey
+                mongoTemplate.save(testKey, coll)
+            }
+            keyCount--
         }
-        if (findTestKey){
-            log.error("Unable to generate random key for questionPaper" + questionPaperId.toString())
-        }else{
-            testKey.authKey = randomKey
-            mongoTemplate.save(testKey, coll)
-        }
+    }
+
+    def createPasswordForCandidate(){
+        return RandomStringUtils.randomAlphanumeric(8)
     }
 
     def findQuestionPaper(String authKey){
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
         def findTest = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(authKey)), TestKey.class, coll)
-        def paper = findTest.getQuestionPaper()
+        def paper
+        if (findTest){
+            paper = questionPaperService.findById(findTest.getCustomerId(), findTest.getQuestionPaperId())
+        }
         return paper
     }
 
-    def getValidKeysForCompany(long customerId){
+    def getValidKeysForTest(long customerId, long testId){
+        //todo: Get Customer id from Principal
+        customerId = 1
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
-        def validKeys = mongoTemplate.findOne(new Query(Criteria.where("customerId").is(customerId)), TestKey.class, coll)
+        def validKeys = mongoTemplate.findOne(new Query(Criteria.where("customerId").is(customerId).and("questionPaperId").is(testId)), TestKey.class, coll)
         return validKeys
     }
 
     def findTestKey(String authKey){
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
-        TestKey findTest = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(authKey)), TestKey.class, coll)
+        TestKey findTest = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(authKey).and("isExpired").is(false)), TestKey.class, coll)
         return findTest
     }
     /**
      * We need to associate authKey with a candidate
      * @param authKey
      */
-    def authorize(String authKey, long cid){
+    def bindAuthKeyWithCandidate(String authKey, long cid){
+        String coll = mongoCollectionFactoryService.getTestKeyCollName()
+        //Associate key to a candidate
+        TestKey testKey = new TestKey()
+        testKey.candidateId = cid
+        testKey.authKey = authKey
+        testKey.expired = true
+        mongoTemplate.updateFirst(new Query(Criteria.where("authKey").is(authKey).and("isExpired").is(false)),
+                Update.update("isExpired", true).set("candidateId", cid),coll)
+    }
+
+    def authorize(String authKey){
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
         TestKey findTest = findTestKey(authKey)
-        //Once key has been authorized it can't be used anymore
-        findTest.expired = true
-        //Associate key to a candidate
-        findTest.candidateId = cid
-        mongoTemplate.save(findTest, coll)
+        return findTest
     }
 
     def getTestKey(){

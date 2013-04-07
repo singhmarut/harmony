@@ -15,7 +15,12 @@ public class Question{
     String option5;
 
     //Order does not matter in choices
-    List<String> choices;
+    //List of correct choices
+    Boolean choice1;
+    Boolean choice2;
+    Boolean choice3;
+    Boolean choice4;
+    Boolean choice5;
 
     String questionType;
     String companyShortName;
@@ -77,14 +82,6 @@ public class Question{
         this.option5 = option5;
     }
 
-    public List<String> getChoices() {
-        return choices;
-    }
-
-    public void setChoices(List<String> choices) {
-        this.choices = choices;
-    }
-
     public String getQuestionType() {
         return questionType;
     }
@@ -125,6 +122,46 @@ public class Question{
         this.userId = userId;
     }
 
+    public Boolean getChoice1() {
+        return choice1;
+    }
+
+    public void setChoice1(Boolean choice1) {
+        this.choice1 = choice1;
+    }
+
+    public Boolean getChoice2() {
+        return choice2;
+    }
+
+    public void setChoice2(Boolean choice2) {
+        this.choice2 = choice2;
+    }
+
+    public Boolean getChoice3() {
+        return choice3;
+    }
+
+    public void setChoice3(Boolean choice3) {
+        this.choice3 = choice3;
+    }
+
+    public Boolean getChoice4() {
+        return choice4;
+    }
+
+    public void setChoice4(Boolean choice4) {
+        this.choice4 = choice4;
+    }
+
+    public Boolean getChoice5() {
+        return choice5;
+    }
+
+    public void setChoice5(Boolean choice5) {
+        this.choice5 = choice5;
+    }
+
     public List<String> getTags() {
         return tags;
     }
@@ -140,4 +177,6 @@ public class Question{
     public void setQuestionId(long questionId) {
         this.questionId = questionId;
     }
+
+
 }

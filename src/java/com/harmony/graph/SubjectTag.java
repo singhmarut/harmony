@@ -4,7 +4,7 @@ public class SubjectTag{
 
     String subjectName;
     long companyId = 1;
-    long nodeId;
+    long skillId;
 
     public String getSubjectName() {
         return subjectName;
@@ -22,11 +22,11 @@ public class SubjectTag{
         this.companyId = companyId;
     }
 
-    public long getNodeId() {
-        return nodeId;
+    public long getSkillId() {
+        return skillId;
     }
 
-    public void setNodeId(long nodeId) {
-        this.nodeId = nodeId;
+    public void setSkillId(long skillId) {
+        this.skillId = skillId;
     }
 }

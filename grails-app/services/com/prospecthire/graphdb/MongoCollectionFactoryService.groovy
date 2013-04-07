@@ -1,6 +1,13 @@
 package com.prospecthire.graphdb
 
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Update
+import com.harmony.graph.Counter
+
 class MongoCollectionFactoryService {
+
+    def mongoTemplate
 
     def serviceMethod() {
 
@@ -35,4 +42,21 @@ class MongoCollectionFactoryService {
         return "testAuthKeys"
     }
 
+    public long increaseCounter(String counterName){
+        Query query = new Query(Criteria.where("name").is(counterName));
+        Update update = new Update().inc("sequence", 1);
+        Counter counter = mongoTemplate.findAndModify(query, update, Counter.class); // return old Counter object
+        if (!counter){
+            counter = new Counter()
+            counter.name = counterName
+            mongoTemplate.insert(counter)
+            counter = mongoTemplate.findAndModify(query, update, Counter.class);
+        }
+        return counter.getSequence();
+    }
+
+    public long increaseQuestionPaperCounter(){
+        final String counterName = "questionPaperId"
+        return increaseCounter(counterName);
+    }
 }

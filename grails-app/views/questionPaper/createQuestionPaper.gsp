@@ -20,8 +20,6 @@
         $(document).ready(function() {
             var url = "${createLink(controller: 'subjectTag', action: 'list')}";
 
-
-
             $('#skillTree').datagrid({
                  onDblClickCell: function(index,field,value){
                     $(this).datagrid('beginEdit', index);
@@ -40,12 +38,6 @@
                     }
                 }
             });
-
-//            $('#sectionDuration').numberbox({
-//                min:0,
-//                precision:1,
-//                max:60
-//            });
 
             $('#tabs').tabs({
                 //tools:'#tab-tools'
@@ -76,13 +68,6 @@
                     title:'New Section',
                     closable:true
                 });
-//                $('#skillTree').datagrid('appendRow',{
-//                    //parent: node.id,  // the node has a 'id' value that defined through 'idField' property
-//                    id: index,
-//                    sectionName: "SectionName",
-//                    duration: 5,
-//                    instructions: "Instructions"
-//                });
             })
 
             $('#accept').bind('click', function(e){
@@ -91,32 +76,49 @@
                     //$('#ddv-0').datagrid('acceptChanges');
                 }
             })
+            $('#generateKeys').bind('click', function(e){
+                var createUrl = "${createLink(controller: 'testKeyGenerator', action: 'generate')}";
+            })
 
             $('#createPaper').bind('click', function(e){
                 var createUrl = "${createLink(controller: 'questionPaper', action: 'create')}";
 
+                var questionPaper = new Object();
+                questionPaper.title = $('#paperTitle').val();
                 var rows = $('#skillTree').treegrid('getRows')
                 var counter = 0;
                 var section = new Object();
 
                 var sections = new Array();
-                section.sectionSubjects = sections;
-                section.sectionName = "Section1";
+
+                var sectionSubjects = new Array();
+                section.duration = 1;
+                //section.sectionSubjects = sections;
+                section.sectionName = $('#sectionName').val();
                 section.instruction = "No Instructions";
 
-                for (; counter < rows.length; counter++){
-                    var row = rows[counter];
+                sections.push(section);
+
+                var jsonQ = JSON.stringify(sections);
+
+                questionPaper.sectionList = sections;
+                jsonQ = JSON.stringify(questionPaper);
+                for (var idx =0; idx < rows.length; idx++){
+                    var row = rows[idx];
                     var sectionSubject = new Object();
-                    sectionSubject.difficultLevel = row.difficulty;
+                    sectionSubject.subjectTagId = row.id;
                     sectionSubject.questionCount = row.questionCount;
-                    sections.push(sectionSubject);
-                    section.duration = row.duration;
+                    sectionSubject.difficultyLevel = row.difficulty;
+                    sectionSubjects.push(sectionSubject);
                 }
+                section.sectionSubjects = sectionSubjects;
+
+                jsonQ = JSON.stringify(questionPaper);
                 $.ajax({
                     url: createUrl,
                     dataType: "json",
-                    tyoe: "POST",
-                    data: {questionPaper: JSON.stringify(section)}
+                    type: "POST",
+                    data: {questionPaper: jsonQ}
                 })
             })
 
@@ -157,11 +159,12 @@
     <div class="easyui-layout" data-options="fit:true">
 
             <div data-options="region:'north'" style="height:50px;padding:10px">
-            <div>
-                <label>Time Restriction</label><input type="checkbox" name="timeRestriction"/>
+                <div>
+                    <label style="padding-left: 10px;padding-right: 10px">Question Paper Title</label>
+                    <input type="text" id="paperTitle"/>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" id="createPaper">Create Question Paper</a>
+                </div>
             </div>
-
-        </div>
         <div data-options="region:'west',split:true" style="width:200px;padding:10px">
             <div class="easyui-accordion" data-options="fit:true">
                 <div title="Paper Options">
@@ -174,7 +177,7 @@
             </div>
         </div>
         <div data-options="region:'center'" style="padding:10px">
-            <label>Section Name</label> <input id="cc" style="width:200px"/>
+            <label>Section Name</label> <input id="sectionName" style="width:200px"/>
             <label style="padding-left: 10px">Duration</label>
             <input type="text" class="easyui-numberbox" value="100" data-options="min:0,max:60" id="sectionDuration"/>
             <label style="padding-left: 2px">Minutes</label>
@@ -183,7 +186,7 @@
                 <thead>
                 <tr>
                     <th data-options="field:'id',width:50">id</th>
-                    <th data-options="field:'subject',width:180,editor:{type:'text'}">Subject</th>
+                    <th data-options="field:'subject',width:180">Subject</th>
                     <th data-options="field:'questionCount',width:100,editor:{type:'text'},align:'right'">Question Count</th>
                     <th data-options="field:'difficulty',width:80,editor:{type:'text'}">Difficulty</th>
                 </tr>

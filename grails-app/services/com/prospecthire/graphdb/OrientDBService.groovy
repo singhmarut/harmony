@@ -6,12 +6,7 @@ import javax.annotation.PostConstruct
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
 import com.harmony.graph.SubjectTag
 import com.harmony.graph.Question
-import com.orientechnologies.orient.object.db.ODatabaseObjectTx
-import com.orientechnologies.orient.object.db.ODatabaseObjectPool
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
-import com.orientechnologies.orient.core.db.record.ODatabaseFlat
-import com.orientechnologies.orient.core.db.record.ODatabaseRecordTx
-import com.orientechnologies.orient.object.db.ODatabaseObjectTxPooled
+
 import com.orientechnologies.orient.core.metadata.schema.OClass
 import com.orientechnologies.orient.core.metadata.schema.OType
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -23,10 +18,11 @@ import com.orientechnologies.orient.core.db.graph.OGraphDatabase
 import com.orientechnologies.orient.core.record.impl.ODocument
 import org.springframework.data.mongodb.core.query.Update
 import com.harmony.graph.Counter
-import com.orientechnologies.orient.object.db.graph.OGraphVertex
-import com.orientechnologies.orient.core.sql.OCommandSQL
-import com.orientechnologies.orient.core.db.record.OIdentifiable
-import com.orientechnologies.orient.core.record.ORecord
+
+import com.orientechnologies.orient.graph.gremlin.OGremlinHelper
+import com.orientechnologies.orient.graph.gremlin.OCommandGremlin
+
+import javax.annotation.PreDestroy
 
 class OrientDBService {
 
@@ -34,6 +30,8 @@ class OrientDBService {
     MongoTemplate mongoTemplate
 
     def mongoCollectionFactoryService
+    final static String DB_USER = "admin"
+    final static String DB_PASSWORD = "admin"
 
     private String getGraphDBName(long customerId){
         return String.format("remote:localhost/graph%d",customerId)
@@ -42,6 +40,16 @@ class OrientDBService {
     class Relationships{
         public final  static  String HAS_SUBJECT = "HAS_CHILD_SUBJECT";
         public final  static  String HAS_QUESTION = "HAS_QUESTION";
+    }
+
+    @PostConstruct
+    void init(){
+        OGremlinHelper.global().create()
+    }
+
+    @PreDestroy
+    void destroy(){
+        //graph.close();
     }
 
 
@@ -127,7 +135,7 @@ class OrientDBService {
         //Create subject in mongo if it does not exist already
         if (!findSubject){
             findSubject = new SubjectTag()
-            findSubject.setNodeId(increaseCounter("nodeId"))
+            findSubject.setSkillId(increaseCounter("nodeId"))
             findSubject.subjectName = subjectTag
             mongoTemplate.insert(findSubject, mongoCollectionFactoryService.getSubjectCollName(companyId))
         }
@@ -158,7 +166,7 @@ class OrientDBService {
                 rootNode = database.createVertex("SubjectTag").field("id", 0).field("subjectName", subjectTag).save();
                 database.setRoot("graph", rootNode);
             }
-            ODocument subjectNode = createNewSubject(subjectTag, findSubject.getNodeId(), companyId)
+            ODocument subjectNode = createNewSubject(subjectTag, findSubject.getSkillId(), companyId)
             if (parentTag) {
 
                 ODocument parentNode = findVertex(parentTag, companyId)
@@ -209,7 +217,11 @@ class OrientDBService {
         return subjectNode
     }
 
-    def findLinksBetweenTags(){
+    def findLinksBetweenTags(OGraphDatabase database,ODocument firstTag, ODocument secondTag){
+        String sql = String.format("SELECT shortestpath(%s,%s)",firstTag.getIdentity(), secondTag.getIdentity())
+        List<ODocument> resultset = database.query(new OSQLSynchQuery<ODocument>(sql))
+
+        database.command(new OCommandGremlin("g.V[0..10]")).execute();
 
     }
 
@@ -257,7 +269,7 @@ class OrientDBService {
             //for (ODocument oDocument in resultset)
             //{
                 SubjectTag subjectTag = new SubjectTag()
-                subjectTag.nodeId = oDocument.field("id")
+                subjectTag.skillId = oDocument.field("id")
                 subjectTag.subjectName =  oDocument.field("subjectName")
                 result.add(subjectTag)
             //}
@@ -281,7 +293,7 @@ class OrientDBService {
             for (ODocument oDocument in resultset){
                 SubjectTag subjectTag = new SubjectTag()
                 ODocument subjectDocument = oDocument.field("in")
-                subjectTag.nodeId = subjectDocument.field("id")
+                subjectTag.skillId = subjectDocument.field("id")
                 subjectTag.subjectName =  subjectDocument.field("subjectName")
                 result.add(subjectTag)
             }
@@ -294,12 +306,18 @@ class OrientDBService {
      * Add questions to database..DB has to be for the company from which user has logged in
      * @param questions
      */
-    void addQuestions(List<Question> questions, long customerId){
-        for (Question question : questions){
-            //Question ID is globally unique
-            question.setQuestionId(increaseCounter("questionId"))
-            long nodeID = increaseCounter("nodeId")
-            mongoTemplate.insert(question, Question.class, mongoCollectionFactoryService.getQuestionsCollName(customerId))
+    void addQuestions(List<Question> questions, long companyId){
+        String graphDBUrl = getGraphDBName(companyId);
+        OGraphDatabase database = OGraphDatabasePool.global().acquire(graphDBUrl, "admin", "admin");
+        try{
+            for (Question question : questions){
+                //Question ID is globally unique
+                question.setQuestionId(increaseCounter("questionId"))
+                long nodeID = increaseCounter("nodeId")
+                mongoTemplate.insert(question, Question.class, mongoCollectionFactoryService.getQuestionsCollName(companyId));
+            }
+        }finally {
+            database.close();
         }
     }
 

@@ -14,7 +14,7 @@ import com.harmony.graph.Question
 class QuestionImportService {
 
     def grailsApplication
-    def orientDBService
+    def hyperService
 
     public String uploadFile(MultipartFile file){
         String excelFilePath = "";
@@ -69,13 +69,13 @@ class QuestionImportService {
                 String columnName = topRow.getCell(cell.getColumnIndex()).getStringCellValue();
 
                 CellReference cellRef = new CellReference(row.getRowNum(), cell.getColumnIndex());
-                System.out.print(cellRef.formatAsString());
+
                 switch (cell.getCellType()) {
                     case Cell.CELL_TYPE_STRING:
                         setQuestionProperty(question, columnName, cell.getStringCellValue())
                         break;
                     case Cell.CELL_TYPE_NUMERIC:
-                        setQuestionProperty(question, columnName, cell.getStringCellValue())
+                        setQuestionProperty(question, columnName, cell.getNumericCellValue().toString())
                         if (DateUtil.isCellDateFormatted(cell)) {
                             //System.out.println(cell.getDateCellValue());
                         } else {
@@ -83,7 +83,7 @@ class QuestionImportService {
                         }
                         break;
                     case Cell.CELL_TYPE_BOOLEAN:
-                        setQuestionProperty(question, columnName, cell.getRichStringCellValue())
+                        setQuestionProperty(question, columnName, cell.getBooleanCellValue().toString())
                         //System.out.println(cell.getBooleanCellValue());
                         break;
                     case Cell.CELL_TYPE_FORMULA:
@@ -95,8 +95,9 @@ class QuestionImportService {
                 }
             }
         }
+        long companyId = 1
         //Ok all questions are read..just commit them to Graph
-        orientDBService.addQuestions(questions)
+        hyperService.addQuestions(questions, companyId)
 
     }
 
@@ -104,9 +105,7 @@ class QuestionImportService {
         if (!question.tags){
             question.tags = new ArrayList<String>()
         }
-        if (!question.choices){
-            question.choices = new ArrayList<String>()
-        }
+
         if(propName.equalsIgnoreCase("text")){
             question.text = propValue
         }else if(propName.equalsIgnoreCase("option1")){
@@ -123,12 +122,24 @@ class QuestionImportService {
             question.questionType = propValue
         }else if(propName.equalsIgnoreCase("tags")){
             question.tags = propValue.split(",").toList()
-        }else if(propName.contains("choice")){
-            question.choices.add(propValue)
+        }else if(propName.equalsIgnoreCase("choice1")){
+            question.choice1 = Boolean.parseBoolean(propValue)
+        }else if(propName.equalsIgnoreCase("choice2")){
+            question.choice2 = Boolean.parseBoolean(propValue)
+        }else if(propName.equalsIgnoreCase("choice3")){
+            question.choice3 = Boolean.parseBoolean(propValue)
+        }else if(propName.equalsIgnoreCase("choice4")){
+            question.choice4 = Boolean.parseBoolean(propValue)
+        }else if(propName.equalsIgnoreCase("choice5")){
+            question.choice5 = Boolean.parseBoolean(propValue)
+        }else if(propName.equalsIgnoreCase("questionType")){
+            question.questionType = propValue
+        }else if(propName.equalsIgnoreCase("tags")){
+            question.tags = propValue.split(",").toList()
         }else if(propName.contains("marks")){
-            question.marks = Integer.toInteger(propValue)
+            question.marks = (int)Double.parseDouble(propValue)
         }else if(propName.contains("difficulty")){
-            question.difficultyLevel = Integer.toInteger(propValue)
+            question.difficultyLevel = (int)Double.parseDouble(propValue)
         }
     }
 }

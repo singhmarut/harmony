@@ -11,6 +11,15 @@
 <head>
   <title>Bulk Upload Questions</title>
     <meta name="layout" content="menu"/>
+    %{--<g:javascript src="/jquery-easyui-1.3.2/jquery-1.8.0.min.js"/>--}%
+    %{--<g:javascript src="/jquery-easyui-1.3.2/jquery.easyui.min.js"/>--}%
+
+    <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/themes/default', file: 'easyui.css')}">
+    <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/demo', file: 'demo.css')}">
+    <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/themes', file: 'icon.css')}">
+
+    <r:layoutResources />
+
 </head>
 <body>
   <div style="margin-top: 20px">
