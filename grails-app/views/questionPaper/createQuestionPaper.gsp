@@ -14,70 +14,186 @@
     <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/demo', file: 'demo.css')}">
     <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/themes', file: 'icon.css')}">
 
+    %{--<g:javascript src="/bootstrap/js/bootstrap.min.js"/>--}%
+
+    %{--<link rel="stylesheet" href="${resource(dir: '/js/bootstrap/css', file: 'bootstrap.min.css')}">--}%
     <r:layoutResources />
 
     <script type="text/javascript">
         $(document).ready(function() {
             var url = "${createLink(controller: 'subjectTag', action: 'list')}";
+            var allSubjectUrl = "${createLink(controller: 'subjectTag', action: 'listAll')}";
+            //Ids of sections
+            var sectionIds = new Array();
+            //Map between section id and section name
+            var sectionIdMap = new Object();
+            var curSecionId;
 
-            $('#skillTree').datagrid({
-                 onDblClickCell: function(index,field,value){
-                    $(this).datagrid('beginEdit', index);
-                    var ed = $(this).datagrid('getEditor', {index:index,field:field});
-                    $(ed.target).focus();
-                },
-                onClickRow: function(index){
-                if (editIndex != index){
-                        if (endEditing()){
-                            $('#skillTree').datagrid('selectRow', index)
-                                    .datagrid('beginEdit', index);
-                            editIndex = index;
-                        } else {
-                            $('#skillTree').datagrid('selectRow', editIndex);
-                        }
-                    }
-                }
-            });
-
-            $('#tabs').tabs({
-                //tools:'#tab-tools'
-                onSelect:function(title){
-                    $('#tt').tabs({
-                        content: 'hello'
-                    });
-                    alert(title+' is selected');
-                }
-            });
+            var sectionInfoMap = new Object();
+            var sectionList = new Array();
 
             var editIndex = undefined;
-            function endEditing(){
+            function endEditing(gridId){
                 if (editIndex == undefined){return true}
-                if ($('#skillTree').datagrid('validateRow', editIndex)){
-                    var ed = $('#skillTree').datagrid('getEditor', {index:editIndex,field:'id'});
-                    $('#skillTree').datagrid('endEdit', editIndex);
+                if ($(gridId).datagrid('validateRow', editIndex)){
+                    var ed = $(gridId).datagrid('getEditor', {index:editIndex,field:'id'});
+                    $(gridId).datagrid('endEdit', editIndex);
                     editIndex = undefined;
+
+                    $(gridId).datagrid('acceptChanges');
                     return true;
                 } else {
                     return false;
                 }
             }
 
-            $('#addSection').bind('click', function(e){
-                var index =0;
-                $('#tabs').tabs('add',{
-                    title:'New Section',
-                    closable:true
+            function accept(gridId){
+                if (endEditing(gridId)){
+                    $(gridId).datagrid('acceptChanges');
+                }
+            }
+
+            function showQuestions(row){
+               var subjectName = row.subject;
+               alert(subjectName);
+            }
+
+            function addNewSection(sectionId, sectionName){
+                sectionIdMap[sectionId] = sectionName;
+                sectionIds.push(sectionId);
+                var divId = "div" + sectionId;
+                $('#questionSections').append('<div id=' + divId + '><table style="width:700px;" class="section" autoRowHeight:true  singleselect:true  striped:true id='+ sectionId + ' title=' + sectionName + '></table></div>');
+                var d = document.getElementById(divId);
+                var x = document.getElementById(sectionId);
+                $(x).datagrid({
+                    idField: "id",
+                toolbar: [
+                        {
+                        iconCls: 'icon-add',
+                        handler: function(){
+                            $(x).datagrid('appendRow',{
+                            subject: '',
+                            questionCount: 1,
+                            difficulty: 1
+                        });
+                      }
+                    },{
+                        iconCls: 'icon-remove',
+                        handler: function(){
+                            $(d).remove();
+                            for (var i =0; i < sectionList.length; i++){
+                                var section = sectionList[i];
+                                if (section == sectionName){
+                                    sectionList.splice(i,1);
+                                    break;
+                                }
+                            }
+                        }
+                    },{
+                        iconCls: 'icon-save',
+                        handler: function(){
+                           accept(x)
+                        }
+                    },{
+                        iconCls: 'icon-ok',
+                        handler: function(){
+                            curSecionId = sectionId;
+                            $('#sectionDlg').dialog('open');
+                        }
+                    }],
+
+                    columns:[[
+                        {field:'id',title:'Id',width:100,hidden:true},
+                        {field:'subject',title:'Subject',width:300,editor:{type:'combobox',options:{
+                            url:allSubjectUrl,
+                            valueField:'text',
+                            textField:'text',
+                            panelHeight:'auto',
+                            editable:false
+                        } }},
+                        {field:'questionCount',title:'Question Count',width:100,align:'right',editor:{type:'numberbox'}},
+                        {field:'difficulty',title:'Difficulty',width:120,align:'right',editor:{type:'numberbox'}},
+                        {field:'action',title:'Compulsory Questions',width:150,align:'center',
+                            formatter:function(value,row,index){
+                                var e = '<a href="#" onclick="showQuestions(this)">Select Questions</a> ';
+                                //var d = '<a href="#" onclick="deleterow(this)">Delete</a>';
+                                return e;
+                            }
+                        },
+                        {field:'saveaction',title:'Action',width:70,align:'center',
+                            formatter:function(value,row,index){
+                                //if (row.editing)
+                                //{
+                                //$(x).datagrid('endEdit', index);
+                                var e = '<a href="#" onclick= saveRow(\'' + x + '\')">Save</a> ';
+                                return e;
+
+//                                } else {
+//                                    var e = '<a href="#" onclick="editrow(this)">Edit</a> ';
+//                                    var d = '<a href="#" onclick="deleterow(this)">Delete</a>';
+//                                    return e+d;
+//                                }
+                            }
+                        }
+                    ]],
+                    onDblClickCell: function(index,field,value){
+                        $(this).datagrid('beginEdit', index);
+                        var ed = $(this).datagrid('getEditor', {index:index,field:field});
+                        $(ed.target).focus();
+                    },
+                    onClickRow: function(index){
+                        if (editIndex != index){
+                            if (endEditing(x)){
+                                $(this).datagrid('selectRow', index)
+                                        .datagrid('beginEdit', index);
+                                editIndex = index;
+                            } else {
+                                $(this).datagrid('selectRow', editIndex);
+                            }
+                        }
+                    }
                 });
+            }
+
+            $('#addNewSection').bind('click', function(e){
+                var index =0;
+                var sectionName = $('#sectionName').val();
+                sectionList.push(sectionName);
+                index = sectionList.length;
+                var sectionId = "section" + index;
+                addNewSection(sectionId, sectionName);
             })
 
-            $('#accept').bind('click', function(e){
-                if (endEditing()){
-                    $('#skillTree').datagrid('acceptChanges');
-                    //$('#ddv-0').datagrid('acceptChanges');
-                }
-            })
             $('#generateKeys').bind('click', function(e){
                 var createUrl = "${createLink(controller: 'testKeyGenerator', action: 'generate')}";
+            })
+
+            $('#sectionDlg').dialog({
+                onBeforeOpen:function(){
+                    var sectionInfo = sectionInfoMap[curSecionId];
+                    if (sectionInfo){
+                        $('#sectionInstruction').val(sectionInfo.instruction);
+                        $('#sectionDuration').val(sectionInfo.duration);
+                    }else{
+                        if (sectionInfo){
+                            $('#sectionInstruction').val(' ');
+                            $('#sectionDuration').val(5);
+                        }
+                    }
+                }
+            })
+
+            $('#saveSectionDetail').bind('click', function(e){
+                var sectionInfo = new Object();
+                sectionInfo.instruction = $('#sectionInstruction').val();
+                sectionInfo.duration = $('#sectionDuration').val();
+                sectionInfoMap[curSecionId] = sectionInfo;
+                $('#sectionDlg').dialog('close');
+                //alert('section detail saved');
+            })
+
+            $('#closeSectionDetail').bind('click', function(e){
+                $('#sectionDlg').dialog('close');
             })
 
             $('#createPaper').bind('click', function(e){
@@ -85,33 +201,44 @@
 
                 var questionPaper = new Object();
                 questionPaper.title = $('#paperTitle').val();
-                var rows = $('#skillTree').treegrid('getRows')
-                var counter = 0;
-                var section = new Object();
-
                 var sections = new Array();
 
-                var sectionSubjects = new Array();
-                section.duration = 1;
-                //section.sectionSubjects = sections;
-                section.sectionName = $('#sectionName').val();
-                section.instruction = "No Instructions";
+                for (var iSection = 0; iSection < sectionIds.length;iSection++){
+                    var sectionId = sectionIds[iSection];
+                    var x=document.getElementById(sectionId);
 
-                sections.push(section);
+                    var rows = $(x).datagrid('getRows')
+                    var counter = 0;
+                    var section = new Object();
 
-                var jsonQ = JSON.stringify(sections);
+                    var sectionSubjects = new Array();
+
+                    //section.sectionSubjects = sections;
+                    section.sectionName = sectionIdMap[sectionId];
+                    var sectionInfo = sectionInfoMap[sectionId];
+                    if (sectionInfo){
+                        section.duration = sectionInfo.duration;
+                        section.instruction = sectionInfo.instruction;
+                    }
+
+
+                    for (var idx =0; idx < rows.length; idx++){
+
+                        var row = rows[idx];
+                        if (row.subject != null && row.subject != ""){
+                            var sectionSubject = new Object();
+                            //sectionSubject.subjectTagId = row.id;
+                            sectionSubject.subjectName = row.subject;
+                            sectionSubject.questionCount = row.questionCount;
+                            sectionSubject.difficultyLevel = row.difficulty;
+                            sectionSubjects.push(sectionSubject);
+                        }
+                    }
+                    section.sectionSubjects = sectionSubjects;
+                    sections.push(section);
+                }
 
                 questionPaper.sectionList = sections;
-                jsonQ = JSON.stringify(questionPaper);
-                for (var idx =0; idx < rows.length; idx++){
-                    var row = rows[idx];
-                    var sectionSubject = new Object();
-                    sectionSubject.subjectTagId = row.id;
-                    sectionSubject.questionCount = row.questionCount;
-                    sectionSubject.difficultyLevel = row.difficulty;
-                    sectionSubjects.push(sectionSubject);
-                }
-                section.sectionSubjects = sectionSubjects;
 
                 jsonQ = JSON.stringify(questionPaper);
                 $.ajax({
@@ -149,8 +276,13 @@
                     }
                 }
             });
+
         });
 
+        function saveRow(sectionId, index){
+            $(sectionId).datagrid('endEdit', index);
+            //$(sectionId).datagrid('acceptChanges');
+        }
     </script>
 </head>
 <body style="margin: 20px">
@@ -163,6 +295,8 @@
                     <label style="padding-left: 10px;padding-right: 10px">Question Paper Title</label>
                     <input type="text" id="paperTitle"/>
                     <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" id="createPaper">Create Question Paper</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" id="addNewSection">Add New Section</a>
+
                 </div>
             </div>
         <div data-options="region:'west',split:true" style="width:200px;padding:10px">
@@ -176,31 +310,37 @@
                 </div>
             </div>
         </div>
-        <div data-options="region:'center'" style="padding:10px">
+        <div data-options="region:'east',split:true" style="width:200px;padding:10px">
+            <div class="easyui-accordion" data-options="fit:true">
+                <div title="Paper Options">
+                    <p>Help</p>
+                </div>
+                <div title="Select Subjects">
+                    <ul id="st" class="easyui-tree" data-options="url:'${createLink(controller: 'subjectTag', action: 'list')}',fit:true,cascadeCheck:false,animate:false,checkbox:true">
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div data-options="region:'center'" style="padding:10px" id="questionSections">
             <label>Section Name</label> <input id="sectionName" style="width:200px"/>
-            <label style="padding-left: 10px">Duration</label>
-            <input type="text" class="easyui-numberbox" value="100" data-options="min:0,max:60" id="sectionDuration"/>
-            <label style="padding-left: 2px">Minutes</label>
-            <table id="skillTree" class="easyui-datagrid" style="width:600px;height:350px;"
-                   data-options="fitColumns:true,singleSelect:true,toolbar: '#tb',">
-                <thead>
-                <tr>
-                    <th data-options="field:'id',width:50">id</th>
-                    <th data-options="field:'subject',width:180">Subject</th>
-                    <th data-options="field:'questionCount',width:100,editor:{type:'text'},align:'right'">Question Count</th>
-                    <th data-options="field:'difficulty',width:80,editor:{type:'text'}">Difficulty</th>
-                </tr>
-                </thead>
-            </table>
         </div>
     </div>
 </div>
-<div id="tb" style="height:auto">
-    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" id="addSection">Add New Section</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">Remove</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" id="accept">Accept</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">Reject</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">Manage Time Restrictons</a>
+
+<div id="sectionDlg" class="easyui-dialog" title="Section Options"
+     data-options="iconCls:'icon-save',modal:true,resizable:true,closed:true, buttons:[{
+                    text:'Save',
+                    id: 'saveSectionDetail'
+                    },{
+                    text:'Close',
+                    id: 'closeSectionDetail'
+                    }]" style="width:400px;height:400px;padding:10px;">
+    <label>Section Time<input class="easyui-numberbox" id="sectionDuration"/> </label>
+    </br>
+    <label>Section Instructions</label>
+    <textarea rows="15" cols="40" id="sectionInstruction" title="Section Instructions">
+    </textarea>
 </div>
+
 </body>
 </html>

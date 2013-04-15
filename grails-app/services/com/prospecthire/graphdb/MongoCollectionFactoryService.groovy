@@ -33,6 +33,10 @@ class MongoCollectionFactoryService {
         return "answerSheets"
     }
 
+    public String getReportsCollName(){
+        return "candidateReports"
+    }
+
     /**
      * For keys there will be only one table as it will be used to identify the test
      * @param customerId

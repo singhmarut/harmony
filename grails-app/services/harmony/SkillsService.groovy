@@ -17,9 +17,20 @@ class SkillsService {
         return subjectTag
     }
 
-    List<SubjectTag> getAllSubjects(String company){
+    SubjectTag findSubjectByName(long companyId, String subjectName){
+        String coll = mongoCollectionFactoryService.getSubjectCollName(companyId)
+        SubjectTag subjectTag = mongoTemplate.findOne(new Query(Criteria.where("companyId").is(companyId).and("subjectName").is(subjectName)),SubjectTag.class, coll)
+        return subjectTag
+    }
+
+    List<SubjectTag> getAllSubjects(String company, int depth){
         Company company1 = Company.findByShortName(company)
-        return hyperService.getTopLevelSubjects(1)
+        return hyperService.getTopLevelSubjects(depth)
+    }
+
+    List<SubjectTag> getSubjects(long companyId){
+        Company company1 = Company.findByShortName(companyId)
+        return hyperService.getAllSubjects(companyId)
     }
 
     List<SubjectTag> getChildrenSubjects(String company,long startNode){

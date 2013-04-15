@@ -51,6 +51,7 @@ grails.project.dependency.resolution = {
         runtime ":gremlin-groovy:2.2.0-SNAPSHOT"
         //build "org.springframework.data:spring-mongodb:1.2.0.RELEASE"
         build ":mongo:2.9.1"
+        build ":freemarker:1.0"
         // runtime 'mysql:mysql-connector-java:5.1.20'
     }
 

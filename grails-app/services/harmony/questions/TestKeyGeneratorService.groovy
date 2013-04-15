@@ -8,6 +8,9 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.apache.shiro.SecurityUtils
 import org.springframework.data.mongodb.core.query.Update
+import com.harmony.questionPaper.AnswerSheet
+import com.harmony.questionPaper.TestStatus
+import com.harmony.questionPaper.QuestionResponse
 
 
 class TestKeyGeneratorService {
@@ -64,13 +67,20 @@ class TestKeyGeneratorService {
         //todo: Get Customer id from Principal
         customerId = 1
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
-        def validKeys = mongoTemplate.findOne(new Query(Criteria.where("customerId").is(customerId).and("questionPaperId").is(testId)), TestKey.class, coll)
+        def validKeys = mongoTemplate.find(new Query(Criteria.where("customerId").is(customerId)
+                .and("questionPaperId").is(testId).and("isExpired").is(false)), TestKey.class, coll)
         return validKeys
     }
 
     def findTestKey(String authKey){
         String coll = mongoCollectionFactoryService.getTestKeyCollName()
         TestKey findTest = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(authKey).and("isExpired").is(false)), TestKey.class, coll)
+        return findTest
+    }
+
+    def findExpiredTestKey(String authKey){
+        String coll = mongoCollectionFactoryService.getTestKeyCollName()
+        TestKey findTest = mongoTemplate.findOne(new Query(Criteria.where("authKey").is(authKey)), TestKey.class, coll)
         return findTest
     }
     /**
@@ -96,5 +106,27 @@ class TestKeyGeneratorService {
 
     def getTestKey(){
         RandomStringUtils.randomAlphanumeric(6)
+    }
+
+    def finishTest(String authKey,long userId,def response){
+        TestKey testKey = findExpiredTestKey(authKey)
+        AnswerSheet answerSheet = new AnswerSheet()
+        QuestionPaper  questionPaper = findQuestionPaper(authKey)
+        answerSheet.authKey = authKey
+        answerSheet.candidateId = userId
+        answerSheet.companyId = testKey.getCustomerId()
+        answerSheet.questionPaperId = testKey.questionPaperId
+        answerSheet.testStatus = TestStatus.FINISHED
+        List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>()
+        for (def questionResponse in response){
+            QuestionResponse qResponse = new QuestionResponse()
+            qResponse.answers = questionResponse['answers']
+            qResponse.questionId = questionResponse['questionId']
+            questionResponses.add(qResponse)
+        }
+        answerSheet.candidateAnswers = questionResponses
+        String coll = mongoCollectionFactoryService.getAnswerCollName(testKey.getCustomerId())
+        mongoTemplate.save(answerSheet, coll)
+
     }
 }

@@ -25,41 +25,179 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            var questionUrl = "${createLink(controller: 'questionPaper', action: 'getQuestionsForPaper')}"
+            var questionUrl = "${createLink(controller: 'questionPaper', action: 'getQuestionsForPaper')}";
+            var submitUrl = "${createLink(controller: 'questionPaper', action: 'submitTest')}";
+            var questionResponseArray = new Array();
+            var response = new Object();
+            var questionArray;
+            var curId = 1;
             $('#question').datagrid({
                 //url:questionUrl
             });
 
-            function showMe(){
-                alert('User clicked on "foo."');
+            $("body").on('click','.option', function(event) {
+                var optionId = $(event.target).attr('id');
+                var optionPair = optionId.split('.');
+                var questionId = optionPair[1] - 1;
+                var optionId = optionPair[2];
+                var questionResponse
+               // if(questionResponse.)
+                questionResponse = questionResponseArray[questionId];
+                if(typeof(questionResponse) != 'undefined' && questionResponse != null)
+                {
+
+                }else{
+                    questionResponse = new Object();
+                    questionResponse.answers = new Array();
+                    questionResponseArray[questionId] = questionResponse;
+                    questionResponse.questionId = questionId;
+                }
+
+                var checked = $(event.target).val();
+
+                var thisCheck = $(this);
+                if (this.checked == true)
+                {
+                     questionResponse.answers[optionId] = parseInt(optionId);
+                }
+                else
+                {
+                    questionResponse.answers[optionId] = -1;
+                    //questionResponse.answers[optionId] = parseInt(optionId);
+                }
+            });
+
+            function preserveQuestionResponse(selectedQId){
+                var actualIndex = parseInt(selectedQId) - 1;
+                var questionResponse = questionResponseArray[selectedQId-1];
+                if(typeof(questionResponse) != 'undefined' && questionResponse != null)
+                {
+                    for (var iOption = 0; iOption < 4; iOption++){
+                        var opResponse = questionResponse.answers[iOption];
+                        if ((opResponse != 'undefined') && (opResponse != null) && (opResponse >= 0)){
+                            var question = questionArray[selectedQId-1];
+                            var optionId = "option" + "." + selectedQId + "." + iOption;
+                            $('#option.1.0').prop("checked",true);
+                        }
+                    }
+                }
             }
 
-            $('li','ul').live('click', function(event){
-                var checkboxID = $(event.target).attr('id');
-                alert(checkboxID);
-                //alert('Click event');
+            function showQuestion(curId){
+                var question = questionArray[curId - 1];
+                var questionResponse = questionResponseArray[curId-1];
+
+                var content = '<p>' + question.text +  '</p>'
+                $('#questionArea').empty();
+                $('#questionArea').append(content);
+                var optionsArray = new Array();
+                optionsArray[0] = question.option1;
+                optionsArray[1] = question.option2;
+                optionsArray[2] = question.option3;
+                optionsArray[3] = question.option4;
+                for (var i =0; i < 4; i++){
+                    var checkBoxId = "option" + "." + curId + "." + i;
+                    var checkBoxValue = false;
+                    var optionsContent;
+                    if(typeof(questionResponse) != 'undefined' && questionResponse != null)
+                    {
+                        var opResponse = questionResponse.answers[i];
+                        if ((opResponse != 'undefined') && (opResponse != null) && (opResponse >= 0)){
+                            checkBoxValue = true;
+                            optionsContent = '<label class="checkbox"> <input type="checkbox" class="option" id=' + checkBoxId + ' checked=' + checkBoxValue + '>' +
+                                    optionsArray[i] +
+                                    '</label>';
+                            //var question = questionArray[curId-1];
+                            //var optionId = "option" + "." + selectedQId + "." + iOption;
+                            //$('#option.1.0').prop("checked",true);
+                        }
+                    }
+                    if (checkBoxValue == false){
+                        optionsContent = '<label class="checkbox"> <input type="checkbox" class="option" id=' + checkBoxId + '>' +
+                            optionsArray[i] +
+                            '</label>';
+                    }
+                    $('#questionArea').append(optionsContent);
+                }
+            }
+
+            $('body').on('click','.qId', function(event){
+                var questionId = $(event.target).attr('id');
+                var canAct = true;
+                if (questionId === "next"){
+                    curId = parseInt(curId) + 1;
+                    if (curId > questionArray.length){
+                        //preserveQuestionResponse(curId);
+                       canAct = false;
+                       curId =  questionArray.length
+                    }
+                }else if (questionId === "prev"){
+
+                    curId = parseInt(curId) - 1;
+                    if (curId < 1){
+                        //preserveQuestionResponse(curId);
+                        canAct = false;
+                        curId =  1;
+                    }
+                }else{
+                    if (questionId != curId){
+                        canAct = true;
+                        curId = questionId;
+
+                    }
+                }
+                if (canAct === true){
+                    showQuestion(curId);
+                    //preserveQuestionResponse(questionId);
+                }
             });
 
             $.ajax({
                 url: questionUrl
 
             }).done(function(data){
-                var questionArray = JSON.parse(data)
-                for (var i=0; i < questionArray.length; i++){
-                    var question = questionArray[i];
-                    id = question.id;
-                    var questionId = i;
-                    questionId = questionId + 1;
-                    var content = '<p>' + question.text +  '</p>'
-                    $('body').append(content);
-                    $('#qid').append('<li><a href="#" id=' + questionId + '>' + questionId + '</a></li>');
+
+                var sectionArray = JSON.parse(data).sectionList;
+
+                for (var s=0; s < sectionArray.length; s++){
+                    var section = sectionArray[s];
+                    $('#sectionBtn').append('<button type="button" class="btn btn-primary" id=sectionBtn' + s + '>' + section.sectionName + '</button>');
+                    //$('#sections').append('<li><a href="#" id=section' + s + '>' + section.sectionName + '</a></li>');
+                    //$('#sectionBtn').append('<li><a href="#" id=section1' + s + '>' + "dummy" + '</a></li>');
+                    questionArray = section.sectionQuestions;
+                    for (var i=0; i < questionArray.length; i++){
+                        var question = questionArray[i];
+                        id = question.id;
+                        var questionId = i;
+                        questionId = questionId + 1;
+                        var content = '<p>' + question.text +  '</p>'
+                        //$('#questionArea').append(content);
+                        $('#qid').append('<li><a href="#" class="qId" id=' + questionId + '>' + questionId + '</a></li>');
+                    }
                 }
+
+                showQuestion(1);
                 $('#qid').append('<li><a href="#" id="next">Next</a></li>');
+            });
+
+            $('#finishTest').bind('click', function(event) {
+                response.candidateResponse = questionResponseArray;
+                $.ajax({
+                    url: submitUrl,
+                    type: "POST",
+                    async:false,
+                    data: {response: JSON.stringify(questionResponseArray)}
+                })
             });
         })
     </script>
 </head>
 <body>
+
+<div class="btn-group" id="sectionBtn" data-toggle="buttons-radio" style="margin-top: 20px">
+    <button type="button" class="btn btn-primary">Dummy Section</button>
+</div>
+
 <div class="pagination">
     <ul id="qid">
         <li><a href="#" id="prev">Prev</a></li>
@@ -68,26 +206,8 @@
 <div id="questionArea">
 
 </div>
-%{--<div class="easyui-panel" title="" style="width:1200px;height:500px">--}%
-
-    %{--<div class="easyui-layout" data-options="fit:true">--}%
-        %{--<div data-options="region:'center'">--}%
-            %{--<label>Section Name</label> <input id="sectionName" style="width:200px"/>--}%
-            %{--<label style="padding-left: 10px">Duration</label>--}%
-            %{--<input type="text" class="easyui-numberbox" value="100" id="sectionDuration" disabled="true"/>--}%
-            %{--<label style="padding-left: 2px">Minutes</label>--}%
-            %{--<p>hello</p>--}%
-        %{--</div>--}%
-        %{--<div data-options="region:'south'" style="padding:10px">--}%
-            %{--<div class="easyui-pagination" style="border:1px solid #ddd;" id="q" data-options="--}%
-                %{--total: 50,--}%
-                %{--pageSize: 1,--}%
-                %{--showPageList: false,--}%
-                %{--showRefresh: false,--}%
-                %{--displayMsg: ''">--}%
-            %{--</div>--}%
-        %{--</div>--}%
-    %{--</div>--}%
-%{--</div>--}%
+<div id="finishTest" style="margin-right: 100px; float: right;">
+    <button class="btn btn-large btn-success" type="button">I'm done</button>
+</div>
 </body>
 </html>

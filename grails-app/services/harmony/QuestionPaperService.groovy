@@ -8,6 +8,9 @@ import com.harmony.graph.Question
 import com.google.gson.Gson
 import com.harmony.questionPaper.SectionSubject
 import com.harmony.graph.SubjectTag
+import com.harmony.questionPaper.TestKey
+import com.harmony.questionPaper.AnswerSheet
+import com.harmony.questionPaper.TestStatus
 
 class QuestionPaperService {
 
@@ -16,6 +19,7 @@ class QuestionPaperService {
     def questionService
     def hyperService
     def skillsService
+    //def testKeyGeneratorService
 
     def createQuestionPaper(QuestionPaper questionPaper,long customerId){
 
@@ -25,7 +29,8 @@ class QuestionPaperService {
         List<Section> sectionList = questionPaper.getSectionList()
         for (Section section in sectionList){
             for (SectionSubject sectionSubject in section.getSectionSubjects()){
-                SubjectTag findSubject = skillsService.findSubjectById(questionPaper.companyId, sectionSubject.subjectTagId)
+                SubjectTag findSubject = skillsService.findSubjectByName(questionPaper.companyId, sectionSubject.subjectName)
+                sectionSubject.subjectTagId = findSubject.getSkillId()
                 List<Question> questions = hyperService.getQuestions(findSubject.subjectName, questionPaper.companyId)
                 List<Long> questionIds = new ArrayList<Long>()
                 for (Question question : questions){
@@ -57,15 +62,41 @@ class QuestionPaperService {
 
     def getAllQuestionsForQuestionPaper(long companyId, long questionPaperId){
         QuestionPaper questionPaper = findById(companyId, questionPaperId)
-        List<Question> questionList = new ArrayList<Question>()
+
         List<Long> questionIds = new ArrayList<Long>()
+        List<Question> allQuestions = new ArrayList<Question>()
         for (Section section in questionPaper.sectionList){
+            List<Question> questionList = new ArrayList<Question>()
             for (SectionSubject sectionSubject : section.getSectionSubjects()){
                 questionIds.addAll(sectionSubject.questionsIds)
+                List<Question> questions = questionService.findQuestions(companyId, questionIds)
+                //Populate section subject with questions
+                sectionSubject.setQuestions(questions)
+                questionList.addAll(questions)
+                allQuestions.addAll(questions)
             }
-            List<Question> subjectQuestions = questionService.findQuestions(companyId, questionIds)
-            questionList.addAll(subjectQuestions)
+            section.setSectionQuestions(questionList);
         }
-        return questionList
+        return allQuestions
+        //return questionList
+    }
+
+    def populateQuestionsForPaper(long companyId, long questionPaperId){
+        QuestionPaper questionPaper = findById(companyId, questionPaperId)
+
+        List<Long> questionIds = new ArrayList<Long>()
+        for (Section section in questionPaper.sectionList){
+            List<Question> questionList = new ArrayList<Question>()
+            for (SectionSubject sectionSubject : section.getSectionSubjects()){
+                questionIds.addAll(sectionSubject.questionsIds)
+                List<Question> questions = questionService.findQuestions(companyId, questionIds)
+                //Populate section subject with questions
+                sectionSubject.setQuestions(questions)
+                questionList.addAll(questions)
+            }
+            section.setSectionQuestions(questionList);
+        }
+        return questionPaper
+        //return questionList
     }
 }

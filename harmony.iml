@@ -99,6 +99,7 @@
           <root url="jar://$USER_HOME$/.grails/ivy-cache/je/jars/je-5.0.34.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/hgdb/jars/hgdb-1.2.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/hgbdbje/jars/hgbdbje-1.2.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/freemarker/jars/freemarker-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

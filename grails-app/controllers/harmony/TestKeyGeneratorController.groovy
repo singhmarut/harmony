@@ -18,7 +18,6 @@ class TestKeyGeneratorController {
         if (!testKeyGeneratorService.findQuestionPaper(authKey) ){
             flash.message = "Wrong Authroization Key. Please try again"
         }
-
     }
 }
 

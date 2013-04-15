@@ -11,9 +11,10 @@ class Section{
     Double duration;
     String sectionName;
     String instruction;
-    String questionList;
 
     List<SectionSubject> sectionSubjects;
+    @Transient
+    List<Question> sectionQuestions;
 
     int totalQuestionCount;
 
@@ -41,14 +42,6 @@ class Section{
         this.instruction = instruction;
     }
 
-    public String getQuestionList() {
-        return questionList;
-    }
-
-    public void setQuestionList(String questionList) {
-        this.questionList = questionList;
-    }
-
     public int getTotalQuestionCount() {
         return totalQuestionCount;
     }
@@ -64,10 +57,17 @@ class Section{
     public void setSectionSubjects(List<SectionSubject> subjects) {
         this.sectionSubjects = subjects;
     }
+
+    public List<Question> getSectionQuestions() {
+        return sectionQuestions;
+    }
+
+    public void setSectionQuestions(List<Question> sectionQuestions) {
+        this.sectionQuestions = sectionQuestions;
+    }
 }
 
 class SectionSubject{
-
     //List of questionsIds will be populated when test is created
     //These question Ids can be from master list as well as from company database
     List<Long> questionsIds;
@@ -75,7 +75,11 @@ class SectionSubject{
     @Transient
     List<Question> questions;
 
+    //List of questions which are compulsory to come
+    List<Question> compulsoryQuestions;
+
     long subjectTagId;
+    String subjectName;
 
     //Difficulty Level of questionsIds 1 - 10
     int difficultyLevel;
@@ -120,5 +124,21 @@ class SectionSubject{
 
     public void setSubjectTagId(long subjectTagId) {
         this.subjectTagId = subjectTagId;
+    }
+
+    public List<Question> getCompulsoryQuestions() {
+        return compulsoryQuestions;
+    }
+
+    public void setCompulsoryQuestions(List<Question> compulsoryQuestions) {
+        this.compulsoryQuestions = compulsoryQuestions;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
 }

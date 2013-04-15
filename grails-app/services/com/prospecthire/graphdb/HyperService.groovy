@@ -28,7 +28,10 @@ import org.hypergraphdb.algorithms.DefaultALGenerator
 import org.hypergraphdb.HGQuery.hg
 import org.hypergraphdb.util.Pair
 import org.hypergraphdb.algorithms.SimpleALGenerator
+import org.hypergraphdb.algorithms.HGDepthFirstTraversal
+import java.util.concurrent.ConcurrentHashMap
 
+@Singleton
 class HyperService {
 
     @Autowired
@@ -39,10 +42,15 @@ class HyperService {
     final static String DB_PASSWORD = "admin"
     final static String ROOT_NODE = "ROOT"
     final static String SKILL_ID = "skillId"
-    HyperGraph graph
+    ConcurrentHashMap<Long,HyperGraph> concurrentHashMap = new ConcurrentHashMap<Long,HyperGraph>()
+//    HyperGraph graph
 
-    private String getGraphDBName(long customerId){
-        return String.format("remote:localhost/graph%d",customerId)
+    private HyperGraph getGraph(long customerId){
+        String graphUrl = String.format("/usr/local/harmony/data/%d",customerId)
+        if (!concurrentHashMap.containsKey(customerId)){
+            concurrentHashMap.addEntry(customerId, HGEnvironment.get(HGEnvironment.get(graphUrl)))
+        }
+        return concurrentHashMap.get(customerId)
     }
 
     class Relationships{
@@ -53,12 +61,12 @@ class HyperService {
     @PostConstruct
     void init(){
 
-        graph =  HGEnvironment.get("/usr/local/data");
+        //graph =  HGEnvironment.get("/usr/local/data");
      }
 
     @PreDestroy
     void destroy(){
-        graph.close();
+        //graph.close();
     }
 
     def createSkill(String companyName, String subjectTag){
@@ -86,17 +94,17 @@ class HyperService {
         return increaseCounter("questionId")
     }
 
-    private void createLink(HGHandle startNode, HGHandle endNode, String linkName){
+    private void createLink(long customerId, HGHandle startNode, HGHandle endNode, String linkName){
         SubjectLink subjectLink = new SubjectLink()
         subjectLink.name = linkName
         HGValueLink link = new HGValueLink(subjectLink, startNode, endNode);
-        graph.add(link)
+        getGraph(customerId).add(link)
     }
 
-    private void createQuestionLink(HGHandle skillNode, HGHandle questionNode){
+    private void createQuestionLink(long customerId, HGHandle skillNode, HGHandle questionNode){
         QuestionLink questionLink = new QuestionLink()
         HGValueLink link = new HGValueLink(questionLink, skillNode, questionNode);
-        graph.add(link)
+        getGraph(customerId).add(link)
     }
 
     SubjectTag findSubjectInMongo(long companyId, String subjectTag){
@@ -115,7 +123,7 @@ class HyperService {
             mongoTemplate.insert(rootNode, mongoCollectionFactoryService.getSubjectCollName(companyId))
         }
         if (!findVertex(ROOT_NODE, 1)){
-            graph.add(rootNode);
+            getGraph(companyId).add(rootNode);
         }
     }
 
@@ -146,24 +154,24 @@ class HyperService {
             HGHandle subjectNode = findVertex(subjectTag,companyId)
             SubjectTag existingSubject
             if(subjectNode){
-                existingSubject = graph.get(subjectNode)
+                existingSubject = getGraph(companyId).get(subjectNode)
             }else{
                 existingSubject = new SubjectTag()
                 existingSubject.subjectName = subjectTag
                 existingSubject.skillId = findSubject.skillId
-                subjectNode = graph.add(existingSubject)
+                subjectNode = getGraph(companyId).add(existingSubject)
             }
 
             if (parentTag) {
                 HGHandle parentNode = findVertex(parentTag, companyId)
                 //database.createEdge(parentTag, subjectNode).save()
-                createLink(parentNode, subjectNode,Relationships.HAS_SUBJECT)
+                createLink(companyId,parentNode, subjectNode,Relationships.HAS_SUBJECT)
             }else{
                 if (!existingSubject.subjectName.equalsIgnoreCase("ROOT"))
                 {
                     HGHandle rootNode = findVertex(ROOT_NODE,1)
                     //If no parent subject then attach it to root node
-                    createLink(rootNode, subjectNode,Relationships.HAS_SUBJECT)
+                    createLink(companyId, rootNode, subjectNode,Relationships.HAS_SUBJECT)
                 }
             }
 
@@ -174,13 +182,13 @@ class HyperService {
     }
 
     HGHandle findVertex(String subjectTag, long companyId){
-        SubjectTag vertex = HGQuery.hg.getOne(graph, HGQuery.hg.and(HGQuery.hg.type(SubjectTag.class), HGQuery.hg.eq("subjectName", subjectTag)))
-        return graph.getHandle(vertex)
+        SubjectTag vertex = HGQuery.hg.getOne(getGraph(companyId), HGQuery.hg.and(HGQuery.hg.type(SubjectTag.class), HGQuery.hg.eq("subjectName", subjectTag)))
+        return getGraph(companyId).getHandle(vertex)
     }
 
     HGHandle findVertex(long nodeId, long companyId){
-        SubjectTag vertex = HGQuery.hg.getOne(graph, HGQuery.hg.and(HGQuery.hg.type(SubjectTag.class), HGQuery.hg.eq(SKILL_ID, nodeId)))
-        return graph.getHandle(vertex)
+        SubjectTag vertex = HGQuery.hg.getOne(getGraph(companyId), HGQuery.hg.and(HGQuery.hg.type(SubjectTag.class), HGQuery.hg.eq(SKILL_ID, nodeId)))
+        return getGraph(companyId).getHandle(vertex)
     }
 
     HGHandle createNewSubject(String subjectTag,long nodeId, long companyId){
@@ -192,7 +200,7 @@ class HyperService {
         try{
             subjectNode = findVertex(subjectTag, companyId)
             if (!subjectNode){
-                newNode = graph.add(subjectNode)
+                newNode = getGraph(companyId).add(subjectNode)
             }
         }finally {
 
@@ -212,8 +220,14 @@ class HyperService {
     List<SubjectTag> getTopLevelSubjects(long companyId){
         //todo: This database has to be different for different accounts to facilitate mutli-tenent database
         List<SubjectTag> subjectTagList = new ArrayList<SubjectTag>()
-        subjectTagList.add(graph.get(findVertex(ROOT_NODE, companyId)))
+        subjectTagList.add(getGraph(companyId).get(findVertex(ROOT_NODE, companyId)))
         return subjectTagList
+    }
+
+    List<SubjectTag> getAllSubjects(long companyId){
+        HGHandle rootHandle = findVertex(ROOT_NODE, companyId)
+        SubjectTag subjectTag1 = getGraph(companyId).get(rootHandle)
+        return getSubjectsTillDepth(companyId, subjectTag1.getSkillId(), 10)
     }
 
     List<SubjectTag> getSubjectsTillDepth(long companyId,long nodeId, int depth){
@@ -222,19 +236,19 @@ class HyperService {
          HGHandle startNode = findVertex(nodeId,companyId)
          try{
 
-             DefaultALGenerator algen = new DefaultALGenerator(graph,
+             DefaultALGenerator algen = new DefaultALGenerator(getGraph(companyId),
                      hg.type(SubjectLink.class),
                      hg.type(SubjectTag.class),
                      false,
                      true,
                      false);
-             SimpleALGenerator simpleGenerator = new SimpleALGenerator(graph)
-             HGTraversal traversal = new HGBreadthFirstTraversal(startNode, algen,1);
+             SimpleALGenerator simpleGenerator = new SimpleALGenerator(getGraph(companyId))
+             HGTraversal traversal = new HGBreadthFirstTraversal(startNode, algen,depth);
              //SubjectTag currentArticle = startingArticle;
              while (traversal.hasNext())
              {
                  Pair<HGHandle, HGHandle> next = traversal.next();
-                 SubjectTag nextArticle = graph.get(next.getSecond());
+                 SubjectTag nextArticle = getGraph(companyId).get(next.getSecond());
                  result.add(nextArticle)
              }
 
@@ -253,14 +267,16 @@ class HyperService {
                 //Question ID is globally unique
                 question.setQuestionId(increaseQuestionCounter())
                 mongoTemplate.insert(question, mongoCollectionFactoryService.getQuestionsCollName(companyId));
+                HyperGraph graph = getGraph(companyId)
                 //Save question in graph
                 HGHandle questionHandle = graph.add(question)
 
-                //For now assumption is that there is only one tag for one question
+                //For now assumption is that there is only one subject for one question
+                //There can be many tags which will be used for Questions finding
                 for(String tag in question.tags){
                     HGHandle tagHandle = findVertex(tag,companyId)
                     if (tagHandle){
-                        createQuestionLink(tagHandle, questionHandle)
+                        createQuestionLink(companyId, tagHandle, questionHandle)
                     }
                 }
             }
@@ -282,6 +298,7 @@ class HyperService {
             return questions
         }
         try {
+            HyperGraph graph = getGraph(companyId)
             DefaultALGenerator algen = new DefaultALGenerator(graph,
                     hg.type(QuestionLink.class),
                     hg.type(Question.class),
@@ -289,7 +306,7 @@ class HyperService {
                     true,
                     false);
             SimpleALGenerator simpleGenerator = new SimpleALGenerator(graph)
-            HGTraversal traversal = new HGBreadthFirstTraversal(startNode, algen,1);
+            HGTraversal traversal = new HGDepthFirstTraversal(startNode, algen);
             //SubjectTag currentArticle = startingArticle;
             while (traversal.hasNext())
             {
@@ -307,6 +324,7 @@ class HyperService {
         //todo: make sure only owner of the questions should be able to see the questions
         List<Question> questions = new ArrayList<Question>()
         HGHandle startNode = findVertex(subjectTag, companyId)
+        HyperGraph graph = getGraph(companyId)
         if (!startNode){
             log.error("Unable to find skill " + subjectTag)
             return questions

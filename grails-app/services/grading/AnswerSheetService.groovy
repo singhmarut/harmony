@@ -51,7 +51,7 @@ class AnswerSheetService {
     def findFinishedAnswerSheets(long questionPaperId,long companyId){
 
         String coll = mongoCollectionFactoryService.getAnswerCollName(companyId)
-        return mongoTemplate.findOne(new Query(Criteria.where("companyId").is(companyId).and("testStatus").is(TestStatus.FINISHED)
+        return mongoTemplate.find(new Query(Criteria.where("companyId").is(companyId).and("testStatus").is(TestStatus.FINISHED)
                 .and("evaluated").is(false)
                 .andOperator(Criteria.where("questionPaperId").is(questionPaperId))), AnswerSheet.class, coll)
 

@@ -8,6 +8,7 @@ package com.harmony.questionPaper;
  * To change this template use File | Settings | File Templates.
  */
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -26,12 +27,10 @@ import java.util.Map;
 //})
 public class AnswerSheet {
 
-    List<QuestionResponse> candidateAnswers;
-
-    @DBRef
-    TestKey testKey;
-
+    public List<QuestionResponse> candidateAnswers;
     TestStatus testStatus = TestStatus.NOT_STARTED;
+
+    ObjectId _id = new ObjectId();
 
     /**
      * Authentication Key
@@ -79,14 +78,6 @@ public class AnswerSheet {
         this.questionPaperId = questionPaperId;
     }
 
-    public TestKey getTestKey() {
-        return testKey;
-    }
-
-    public void setTestKey(TestKey testKey) {
-        this.testKey = testKey;
-    }
-
     public Long getCompanyId() {
         return companyId;
     }
@@ -110,35 +101,13 @@ public class AnswerSheet {
     public void setTestStatus(TestStatus testStatus) {
         this.testStatus = testStatus;
     }
-}
 
-class QuestionResponse{
-
-    long questionId;
-    List<String> answers;
-    int marksScored;
-
-    public long getQuestionId() {
-        return questionId;
+    public Object get_id() {
+        return _id;
     }
 
-    public void setQuestionId(long questionId) {
-        this.questionId = questionId;
-    }
-
-    public List<String> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(List<String> answers) {
-        this.answers = answers;
-    }
-
-    public int getMarksScored() {
-        return marksScored;
-    }
-
-    public void setMarksScored(int marksScored) {
-        this.marksScored = marksScored;
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 }
+

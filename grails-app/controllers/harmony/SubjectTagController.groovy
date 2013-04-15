@@ -30,7 +30,7 @@ class SubjectTagController {
            long id = params['id'] as Long
            skillTags  = skillsService.getChildrenSubjects(companyName, id)
         } else{
-            skillTags = skillsService.getAllSubjects(companyName)
+            skillTags = skillsService.getAllSubjects(companyName,1)
         }
 
 
@@ -46,6 +46,19 @@ class SubjectTagController {
         //SkillResult skillResult = new SkillResult()
         String json = new Gson().toJson(allSubjects)
         render json
+    }
+
+    def listAll(){
+        def skillTags = skillsService.getSubjects(1)
+        def allSubjects = new ArrayList<SubjectDto>()
+        for (SubjectTag subjectTag in skillTags){
+            SubjectDto subjectDto = new SubjectDto()
+            subjectDto.company = subjectTag.companyId
+            subjectDto.text = subjectTag.subjectName
+            subjectDto.id = subjectTag.skillId
+            allSubjects.add(subjectDto)
+        }
+        render new Gson().toJson(allSubjects)
     }
 
     def create(){

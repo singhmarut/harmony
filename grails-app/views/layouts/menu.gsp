@@ -32,17 +32,12 @@
     <shiro:isNotLoggedIn>
         <a href="${createLink(controller: 'auth')}">Login</a>
     </shiro:isNotLoggedIn>
-
-
-
     <shiro:isLoggedIn>
         <shiro:hasAnyRole in="['ROLE_ADMIN','ROLE_CANDIDATE']">
         Welcome <shiro:principal/>
         <a href="${createLink(controller: 'auth', action: 'signOut')}">Logout</a>
         </shiro:hasAnyRole>
     </shiro:isLoggedIn>
-
-
     <r:layoutResources />
 
 </head>

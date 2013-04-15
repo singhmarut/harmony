@@ -17,9 +17,13 @@ class QuestionService {
             Question question = mongoTemplate.findOne(new Query(Criteria.where("questionId").is(questionId)), Question.class, coll)
             questions.add(question)
         }
-
-
         return questions
+    }
+
+    Question findQuestion(long companyId, long questionId){
+        String coll = mongoCollectionFactoryService.getQuestionsCollName(companyId)
+        Question question = mongoTemplate.findOne(new Query(Criteria.where("questionId").is(questionId)), Question.class, coll)
+        return question;
     }
 
     def findQuestions(long companyId, long subjectId){

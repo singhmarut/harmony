@@ -5,11 +5,15 @@
     %{--<meta name="layout" content="main">--}%
     %{--<g:javascript library="jquery"/>--}%
 
-    <g:javascript src="/jquery-ui/js/jquery-1.9.1.js"/>
-    <g:javascript src="/jquery-ui/js/jquery-ui-1.10.2.custom.js"/>
-    <g:javascript src="/jtable/jquery.jtable.js"/>
-    <link rel="stylesheet" href="${resource(dir: 'js/jquery-ui/css', file: 'ui-lightness/jquery-ui-1.10.2.custom.css')}" type="text/css">
-    <link rel="stylesheet" href="${resource(dir: 'js/jtable/themes/lightcolor/orange', file: 'jtable.css')}" type="text/css">
+    <g:javascript src="/jquery-easyui-1.3.2/jquery-1.8.0.min.js"/>
+    <g:javascript src="/jquery-easyui-1.3.2/jquery.easyui.min.js"/>
+    <script type="text/javascript" src= "http://www.jeasyui.com/easyui/datagrid-detailview.js"></script>
+    <g:javascript src="/jqwidgets-ver2.8/jqwidgets/jqx-all.js"/>
+
+    <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/themes/default', file: 'easyui.css')}">
+    <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/demo', file: 'demo.css')}">
+    <link rel="stylesheet" href="${resource(dir: '/js/jquery-easyui-1.3.2/themes', file: 'icon.css')}">
+
     <r:layoutResources />
     <script type="text/javascript">
     $(document).ready(function() {
@@ -141,7 +145,26 @@
 </head>
 <body>
 <div id="ExpenseTableContainer">
-
+    <table class="easyui-datagrid" style="width:400px;height:250px"
+           data-options="url:'datagrid_data.json',fitColumns:true,singleSelect:true">
+        <thead>
+        <tr>
+            <th data-options="field:'text',width:100">Code</th>
+            <th data-options="field:'option1',width:100,checkbox:true">Option 1</th>
+            <th data-options="field:'option2',width:100,checkbox:true'">Option 2</th>
+            <th data-options="field:'option3',width:100,checkbox:true'">Option 3</th>
+            <th data-options="field:'option4',width:100,checkbox:true'">Option 4</th>
+            <th data-options="field:'option5',width:100,checkbox:true'">Option 5</th>
+            <th data-options="field:'choice1',width:100,checkbox:true">Option 1</th>
+            <th data-options="field:'choice2',width:100,checkbox:true'">Option 2</th>
+            <th data-options="field:'choice3',width:100,checkbox:true'">Option 3</th>
+            <th data-options="field:'choice4',width:100,checkbox:true'">Option 4</th>
+            <th data-options="field:'choice5',width:100,checkbox:true'">Option 5</th>
+            <th data-options="field:'marks',width:100'">Marks</th>
+            <th data-options="field:'difficultyLevel',width:100">Difficulty Level</th>
+        </tr>
+        </thead>
+    </table>
 </div>
 <g:form>
 

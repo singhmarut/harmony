@@ -45,38 +45,8 @@ class QuestionController {
         [questionInstance: new Question(params)]
     }
 
-//    def updateQuestionProps(Question questionInstance){
-//        questionInstance.text = params['text']
-//        questionInstance.option1 = params['option1']
-//        questionInstance.option2 = params['option2']
-//        questionInstance.option3 = params['option3']
-//        questionInstance.option4 = params['option4']
-//        questionInstance.option5 = params['option5']
-//        questionInstance.choice1 = params['choice1']
-//        questionInstance.choice2 = params['choice2']
-//        questionInstance.choice3 = params['choice3']
-//        questionInstance.choice4 = params['choice4']
-//        questionInstance.choice5 = params['choice5']
-//
-//        questionInstance.questionType = "MCQ"
-//        questionInstance.marks = 1
-//        return questionInstance
-//    }
-
     def save() {
-        def questionInstance = new Question()
-        questionInstance = updateQuestionProps(questionInstance)
-                QuestionResult questionResult = new QuestionResult()
-        def questionList = new ArrayList()
-        questionList.add(questionInstance)
 
-        String json = new Gson().toJson(questionResult)
-        questionInstance.save(flush: true)
-
-        questionResult.data = questionList
-        questionResult.curPage = 1
-        questionResult.totalRecords = questionList.count()
-        render json
     }
 
     def showBulkUpload(){

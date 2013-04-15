@@ -1,20 +1,23 @@
 package harmony
 
-import com.harmony.questionPaper.Section
 import com.harmony.questionPaper.QuestionPaper
 import org.apache.shiro.SecurityUtils
 import com.google.gson.Gson
-import org.apache.shiro.grails.annotations.PermissionRequired
-import org.apache.shiro.authz.annotation.RequiresPermissions
+
 import org.apache.shiro.subject.Subject
 import org.apache.shiro.authz.annotation.RequiresRoles
-import com.harmony.graph.Question
+
+import com.google.gson.GsonBuilder
+import java.lang.reflect.Modifier
+
+import groovy.json.JsonSlurper
 
 
 class QuestionPaperController {
 
     def questionPaperService
     def testKeyGeneratorService
+    def scoringService
 
     def getSkills(){
 
@@ -47,8 +50,10 @@ class QuestionPaperController {
         Subject currentUser = SecurityUtils.getSubject()
         String authKey = currentUser.getSession().getAttribute("authKey")
         QuestionPaper questionPaper = testKeyGeneratorService.findQuestionPaper(authKey)
-        List<Question> questionList = questionPaperService.getAllQuestionsForQuestionPaper(questionPaper.getCompanyId(), questionPaper.getQuestionPaperId())
-        render(new Gson().toJson(questionList))
+        questionPaper = questionPaperService.populateQuestionsForPaper(questionPaper.getCompanyId(), questionPaper.getQuestionPaperId())
+        Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC)
+                .create();
+        render(gson.toJson(questionPaper))
     }
 
     def create(){
@@ -59,16 +64,49 @@ class QuestionPaperController {
         render view: "createSections"
     }
 
+    def submitTest(){
+
+        String response = params['response']
+        def json= new JsonSlurper().parseText(response)
+
+        Subject subject = SecurityUtils.subject
+        String authKey = subject.getSession().getAttribute("authKey")
+        //long userId = subject.getSession().getAttribute("userId")
+        //userId = 1
+        testKeyGeneratorService.finishTest(authKey,1 ,json)
+        //Test done leave the session
+        //subject.logout()
+    }
+
     @RequiresRoles("ROLE_ADMIN")
     def getQuestionPaperKeys(long questionPaperId){
         Subject subject = SecurityUtils.subject
         def userId = subject.getSession().getAttribute("userId")
-        //todo: change this user id to proper user
-        userId = 1
         testKeyGeneratorService.getValidKeysForTest(userId,questionPaperId)
+    }
+
+    def showQuestionPaperKeys(){
+        //String url = g.createLink()
+        startScoring()
+        //response.addHeader("redirect")
+        //redirect(view: "authKeys", model: [questionPaperId: params['questionPaperId']])
+    }
+
+    def startScoring(long questionPaperId){
+        Subject currentUser = SecurityUtils.subject
+        long userId = currentUser.getSession().getAttribute("userId")
+        scoringService.score(userId, questionPaperId)
     }
 
     def index() {
         render(view: "paperOptions")
     }
+}
+
+class TestResponseDto{
+    List<QuestionResponseDto> candidateResponse
+}
+class QuestionResponseDto{
+    long questionId;
+    List<Integer> answers;
 }

@@ -10,6 +10,9 @@ class QuestionPaper{
 
     String instruction;
     boolean active = false;
+
+    //Max Marks can be overridden by question paper level setting
+    long maxMarksForAQuestion;
     //Checks whether a test can be taken within certain date/time range or not
     boolean timeRestriction = false;
     long companyId;
@@ -79,5 +82,13 @@ class QuestionPaper{
 
     public void setTimeRestriction(boolean timeRestriction) {
         this.timeRestriction = timeRestriction;
+    }
+
+    public long getMaxMarksForAQuestion() {
+        return maxMarksForAQuestion;
+    }
+
+    public void setMaxMarksForAQuestion(long maxMarksForAQuestion) {
+        this.maxMarksForAQuestion = maxMarksForAQuestion;
     }
 }
