@@ -10,7 +10,7 @@
 <html>
 <head>
     <title>Question Paper</title>
-    <meta name="layout" content="menu"/>
+    <meta name="layout" content="empty"/>
     <meta charset="UTF-8">
 
     <g:javascript src="/jquery-easyui-1.3.2/jquery-1.8.0.min.js"/>
@@ -29,11 +29,26 @@
             var submitUrl = "${createLink(controller: 'questionPaper', action: 'submitTest')}";
             var questionResponseArray = new Array();
             var response = new Object();
+            //Array of question for current section
             var questionArray;
+            var sectionArray = new Array();
+            var sectionPaginationArray = new Array();
+            //current id of section
+            var curSectionId = 0;
+            //current id of question
             var curId = 1;
             $('#question').datagrid({
                 //url:questionUrl
             });
+
+            $('#sectionBtn').click(function (e) {
+                var id = $(event.target).attr('id');
+                var sectionId = parseInt(id.replace("sectionBtn",''))
+                e.preventDefault();
+                $(this).tab('show');
+                showSection(sectionId);
+                showQuestion(sectionId, 1);
+            })
 
             $("body").on('click','.option', function(event) {
                 var optionId = $(event.target).attr('id');
@@ -83,7 +98,18 @@
                 }
             }
 
-            function showQuestion(curId){
+            function showSection(sectionId){
+                var sectionPagination = sectionPaginationArray[sectionId];
+                $('#qid').empty();
+                $('#qid').append(sectionPagination);
+                $('#qid').append('<li><a href="#" id="next">Next</a></li>');
+                var sectionBtnId = "sectionBtn" + sectionId;
+                $("#sectionBtn0").addClass('active');
+            }
+
+            function showQuestion(sectionId, curId){
+
+                questionArray = sectionArray[sectionId].sectionQuestions;
                 var question = questionArray[curId - 1];
                 var questionResponse = questionResponseArray[curId-1];
 
@@ -123,6 +149,8 @@
 
             $('body').on('click','.qId', function(event){
                 var questionId = $(event.target).attr('id');
+                var sectionId = questionId.split(".")[0];
+                var qid = questionId.split(".")[1];
                 var canAct = true;
                 if (questionId === "next"){
                     curId = parseInt(curId) + 1;
@@ -142,12 +170,11 @@
                 }else{
                     if (questionId != curId){
                         canAct = true;
-                        curId = questionId;
-
+                        curId = qid;
                     }
                 }
                 if (canAct === true){
-                    showQuestion(curId);
+                    showQuestion(sectionId,curId);
                     //preserveQuestionResponse(questionId);
                 }
             });
@@ -157,7 +184,7 @@
 
             }).done(function(data){
 
-                var sectionArray = JSON.parse(data).sectionList;
+                sectionArray = JSON.parse(data).sectionList;
 
                 for (var s=0; s < sectionArray.length; s++){
                     var section = sectionArray[s];
@@ -165,19 +192,31 @@
                     //$('#sections').append('<li><a href="#" id=section' + s + '>' + section.sectionName + '</a></li>');
                     //$('#sectionBtn').append('<li><a href="#" id=section1' + s + '>' + "dummy" + '</a></li>');
                     questionArray = section.sectionQuestions;
+                    var sectionLevelPagination='';
                     for (var i=0; i < questionArray.length; i++){
                         var question = questionArray[i];
                         id = question.id;
                         var questionId = i;
                         questionId = questionId + 1;
                         var content = '<p>' + question.text +  '</p>'
-                        //$('#questionArea').append(content);
-                        $('#qid').append('<li><a href="#" class="qId" id=' + questionId + '>' + questionId + '</a></li>');
+                        var questionSectionId = "qid" + s;
+                        var sectionPagination = '<ul id=' + questionSectionId + '>';
+                        //Every question has different qid sectionId.qid
+                        sectionPagination = sectionPagination + '<li><a href="#" class="qId" id=' + s + '.' + questionId + '>' + questionId + '</a></li>';
+                        sectionPagination = sectionPagination + '</ul>';
+                        if (typeof(sectionLevelPagination) != 'undefined'){
+                            sectionLevelPagination = sectionLevelPagination + sectionPagination;
+                        }else{
+                            sectionLevelPagination = sectionPagination;
+                        }
+                        //$('#qid').append(sectionPagination);
+                        //$('#qid').append('<li><a href="#" class="qId" id=' + questionId + '>' + questionId + '</a></li>');
                     }
+                    sectionPaginationArray.push(sectionLevelPagination);
                 }
+                showSection(curSectionId);
+                showQuestion(curSectionId,curId);
 
-                showQuestion(1);
-                $('#qid').append('<li><a href="#" id="next">Next</a></li>');
             });
 
             $('#finishTest').bind('click', function(event) {
@@ -195,7 +234,7 @@
 <body>
 
 <div class="btn-group" id="sectionBtn" data-toggle="buttons-radio" style="margin-top: 20px">
-    <button type="button" class="btn btn-primary">Dummy Section</button>
+    %{--<button type="button" class="btn btn-primary">Dummy Section</button>--}%
 </div>
 
 <div class="pagination">
@@ -207,7 +246,7 @@
 
 </div>
 <div id="finishTest" style="margin-right: 100px; float: right;">
-    <button class="btn btn-large btn-success" type="button">I'm done</button>
+    <button class="btn btn-large btn-success" type="button">Finish</button>
 </div>
 </body>
 </html>

@@ -12,6 +12,8 @@ import org.bson.types.ObjectId;
 public class CandidateReport {
     ObjectId _id = new ObjectId();
     String authKey;
+    long questionPaperId;
+    long customerId;
     long candidateId;
     String htmlReport;
 

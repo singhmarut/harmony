@@ -48,25 +48,22 @@
                             var e = '<a href="#" onclick="startScore(\'' + index + '\')">Start Scoring</a> ';
                             return e;
                         }
+                    },
+                    {field:'authKeys',title:'Authentication Keys',width:100,align:'right',
+                        formatter:function(value,row,index){
+                            var e = '<a href="#" onclick="showAuthKeys(\'' + index + '\')">Show Keys</a> ';
+                            return e;
+                        }
+                    },
+                    {field:'reports',title:'Results',width:100,align:'right',
+                        formatter:function(value,row,index){
+                            var e = '<a href="#" onclick="showReports(\'' + index + '\')">Show Keys</a> ';
+                            return e;
+                        }
                     }
                 ]]
             });
 
-            $('#showKeys').bind('click', function(e){
-                var authKeyUrl = "${createLink(controller: 'questionPaper', action: 'showQuestionPaperKeys')}";
-                var row = $('#questionPaperGrid').datagrid('getSelected');
-                var paperId = row.questionPaperId
-                $.ajax({
-                    url: authKeyUrl,
-                    type: "GET",
-                    data: {questionPaperId: paperId}
-                }).done(function(data){
-                    if (data.redirect) {
-                        // data.redirect contains the string URL to redirect to
-                        window.location.href = data.redirect;
-                    }
-                })
-            });
         });
 
       function startScore(row){
@@ -84,6 +81,25 @@
           })
       }
 
+    function showAuthKeys(row){
+        var rowId = parseInt(row);
+        var rows = $('#questionPaperGrid').datagrid('getRows');
+        var thisRow = rows[rowId];
+        var authKeyUrl = "${createLink(controller: 'questionPaper', action: 'showAuthKeys')}" + "?questionPaperId=" + thisRow.questionPaperId;
+
+        var paperId = row.questionPaperId
+        window.location.href = authKeyUrl;
+    }
+
+    function showReports(row){
+        var rowId = parseInt(row);
+        var rows = $('#questionPaperGrid').datagrid('getRows');
+        var thisRow = rows[rowId];
+        var reportsUrl = "${createLink(controller: 'reports', action: 'showCandidateReportsView')}" + "?questionPaperId=" + thisRow.questionPaperId;
+
+        var paperId = row.questionPaperId
+        window.location.href = reportsUrl;
+    }
     </script>
 </head>
 <body style="margin: 20px">

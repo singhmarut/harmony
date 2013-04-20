@@ -30,8 +30,8 @@ import org.hypergraphdb.util.Pair
 import org.hypergraphdb.algorithms.SimpleALGenerator
 import org.hypergraphdb.algorithms.HGDepthFirstTraversal
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
-@Singleton
 class HyperService {
 
     @Autowired
@@ -42,13 +42,16 @@ class HyperService {
     final static String DB_PASSWORD = "admin"
     final static String ROOT_NODE = "ROOT"
     final static String SKILL_ID = "skillId"
-    ConcurrentHashMap<Long,HyperGraph> concurrentHashMap = new ConcurrentHashMap<Long,HyperGraph>()
+    def concurrentHashMap
 //    HyperGraph graph
 
     private HyperGraph getGraph(long customerId){
         String graphUrl = String.format("/usr/local/harmony/data/%d",customerId)
+        File file = new File(graphUrl)
+        file.mkdirs()
         if (!concurrentHashMap.containsKey(customerId)){
-            concurrentHashMap.addEntry(customerId, HGEnvironment.get(HGEnvironment.get(graphUrl)))
+            HyperGraph hyperGraph = HGEnvironment.get(graphUrl)
+            concurrentHashMap.put(customerId as Long, hyperGraph)
         }
         return concurrentHashMap.get(customerId)
     }
@@ -60,7 +63,7 @@ class HyperService {
 
     @PostConstruct
     void init(){
-
+        concurrentHashMap = new ConcurrentHashMap<Long,HyperGraph>()
         //graph =  HGEnvironment.get("/usr/local/data");
      }
 

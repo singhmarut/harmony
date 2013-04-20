@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Question Paper</title>
+    <title>Authentication Keys</title>
     <meta name="layout" content="menu"/>
     <meta charset="UTF-8">
 
@@ -30,14 +30,15 @@
     </script>
 </head>
 <body style="margin: 20px">
+    <label><b>Authenticaion Keys for Question Paper ${questionPaperId}</b></label>
     <div style="padding:10px">
         <table id="authKeyGrid" class="easyui-datagrid" style="width:600px;height:300px;"
-               url = "${createLink(controller: 'questionPaper', action: 'getQuestionPaperKeys' ) } "
+               url = "${createLink(controller: 'questionPaper', action: 'showQuestionPaperKeys' ) }?questionPaperId=${questionPaperId}"
                data-options="fitColumns:true,singleSelect:true">
             <thead>
             <tr>
-                <th data-options="field:'questionPaperId',width:50">Id</th>
-                <th data-options="field:'authKey',width:180">Title</th>
+                <th data-options="field:'questionPaperId',width:50">Question Paper Id</th>
+                <th data-options="field:'authKey',width:180">Auth Key</th>
             </tr>
             </thead>
         </table>

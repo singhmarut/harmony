@@ -5,6 +5,7 @@ import com.harmony.shiro.auth.User
 import com.harmony.questionPaper.AnswerSheet
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Criteria
+import com.harmony.questionPaper.CandidateReport
 
 class ReportingService {
 
@@ -13,7 +14,11 @@ class ReportingService {
     def mongoTemplate
 
     def findCandidateReport(String authKey){
-       return mongoTemplate.findOne(new Query().addCriteria(Criteria.where("authKey").is(authKey), mongoCollectionFactoryService.getReportsCollName()));
+       return mongoTemplate.findOne(new Query().addCriteria(Criteria.where("authKey").is(authKey), CandidateReport.class, mongoCollectionFactoryService.getReportsCollName()));
+    }
+
+    def findTestReports(long customerId, long questionPaperId){
+        return mongoTemplate.find(new Query().addCriteria(Criteria.where("customerId").is(customerId).and("questionPaperId").is(questionPaperId),CandidateReport.class, mongoCollectionFactoryService.getReportsCollName()));
     }
 
     /**

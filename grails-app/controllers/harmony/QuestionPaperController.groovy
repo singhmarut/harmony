@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder
 import java.lang.reflect.Modifier
 
 import groovy.json.JsonSlurper
+import grails.converters.JSON
 
 
 class QuestionPaperController {
@@ -86,10 +87,17 @@ class QuestionPaperController {
     }
 
     def showQuestionPaperKeys(){
-        //String url = g.createLink()
-        startScoring()
+        long questionPaperId = params['questionPaperId'] as Long
+        Subject subject = SecurityUtils.subject
+        def userId = subject.getSession().getAttribute("userId")
+        render testKeyGeneratorService.getValidKeysForTest(userId,questionPaperId) as JSON
+
         //response.addHeader("redirect")
         //redirect(view: "authKeys", model: [questionPaperId: params['questionPaperId']])
+    }
+
+    def showAuthKeys(long questionPaperId){
+        render view: "authKeys", model: [questionPaperId: questionPaperId]
     }
 
     def startScoring(long questionPaperId){

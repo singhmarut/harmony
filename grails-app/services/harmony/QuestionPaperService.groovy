@@ -84,9 +84,10 @@ class QuestionPaperService {
     def populateQuestionsForPaper(long companyId, long questionPaperId){
         QuestionPaper questionPaper = findById(companyId, questionPaperId)
 
-        List<Long> questionIds = new ArrayList<Long>()
+
         for (Section section in questionPaper.sectionList){
             List<Question> questionList = new ArrayList<Question>()
+            List<Long> questionIds = new ArrayList<Long>()
             for (SectionSubject sectionSubject : section.getSectionSubjects()){
                 questionIds.addAll(sectionSubject.questionsIds)
                 List<Question> questions = questionService.findQuestions(companyId, questionIds)

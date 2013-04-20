@@ -72,7 +72,7 @@
                 <shiro:isLoggedIn>
                     <li>Reports
                         <ul>
-                            <li><a href="${createLink(controller: 'testReports', action:'showCandidateReport')}">My Reports</a></li>
+                            <li><a href="${createLink(controller: 'reports', action:'showCandidateReport')}">My Reports</a></li>
                         </ul>
                     </li>
                 </shiro:isLoggedIn>
