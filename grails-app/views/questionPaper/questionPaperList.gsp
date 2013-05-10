@@ -49,15 +49,21 @@
                             return e;
                         }
                     },
-                    {field:'authKeys',title:'Authentication Keys',width:100,align:'right',
+                    {field:'authKeys',title:'Authentication Keys',width:130,align:'right',
                         formatter:function(value,row,index){
                             var e = '<a href="#" onclick="showAuthKeys(\'' + index + '\')">Show Keys</a> ';
                             return e;
                         }
                     },
-                    {field:'reports',title:'Results',width:100,align:'right',
+                    {field:'reports',title:'Results',width:150,align:'right',
                         formatter:function(value,row,index){
-                            var e = '<a href="#" onclick="showReports(\'' + index + '\')">Show Keys</a> ';
+                            var e = '<a href="#" onclick="showReports(\'' + index + '\')">Show Candidate Reports</a> ';
+                            return e;
+                        }
+                    },
+                    {field:'paper',title:'Edit Paper',width:150,align:'right',
+                        formatter:function(value,row,index){
+                            var e = '<a href="#" onclick="editQuestionPaper(\'' + index + '\')">Edit/View</a> ';
                             return e;
                         }
                     }
@@ -100,20 +106,41 @@
         var paperId = row.questionPaperId
         window.location.href = reportsUrl;
     }
+
+    function editQuestionPaper(row){
+        var rowId = parseInt(row);
+        var rows = $('#questionPaperGrid').datagrid('getRows');
+        var thisRow = rows[rowId];
+        var reportsUrl = "${createLink(controller: 'questionPaper', action: 'getPaper')}" + "?questionPaperId=" + thisRow.questionPaperId;
+
+        var paperId = row.questionPaperId
+        window.location.href = reportsUrl;
+    }
     </script>
 </head>
 <body style="margin: 20px">
 
-<div class="easyui-panel" title="Create Authorization Keys" style="width:1200px;height:500px;padding:10px;">
+<div class="easyui-panel" title="My Question Papers" style="width:1200px;height:500px;padding:10px;">
     <div class="easyui-layout" data-options="fit:true">
 
         <div data-options="region:'north'" style="height:100px;padding:10px">
             <div>
                 <div class="control-group">
                     <div class="controls">
-                        <label>No. Of Keys<input type="text" id="keyCount"/></label>
+                        <table style="padding-left: 5px">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        <label>No. of Keys</label>
+                                    </th>
+                                    <th>
+                                        <input type="text" id="keyCount" style="padding-left: 120px"/>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+
                         <button type="submit" class="btn btn-small btn-primary" id="generateKeys">Generate Keys</button>
-                        <button type="submit" id="showKeys" target="_blank" class="btn btn-small btn-info">Show Valid Keys</button>
                         %{--<button type="submit" class="btn btn-small btn-info" id="authKeys">Show Valid Keys</button>--}%
                     </div>
                 </div>

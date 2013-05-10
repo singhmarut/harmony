@@ -48,4 +48,20 @@ public class CandidateReport {
     public void setHtmlReport(String htmlReport) {
         this.htmlReport = htmlReport;
     }
+
+    public long getQuestionPaperId() {
+        return questionPaperId;
+    }
+
+    public void setQuestionPaperId(long questionPaperId) {
+        this.questionPaperId = questionPaperId;
+    }
+
+    public long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(long customerId) {
+        this.customerId = customerId;
+    }
 }

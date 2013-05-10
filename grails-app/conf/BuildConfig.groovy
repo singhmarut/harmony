@@ -24,6 +24,7 @@ grails.project.dependency.resolution = {
 
         mavenLocal()
         mavenCentral()
+        //mavenRepo("http://m2.neo4j.org")
 
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
         //mavenRepo "http://snapshots.repository.codehaus.org"
@@ -34,6 +35,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         runtime 'mysql:mysql-connector-java:5.1.20'
+        compile "org.neo4j:neo4j:1.8.2"
         build ":gson:2.2.2"
         build ":orient-commons:1.3.0"
         build ":orientdb-core:1.3.0"
@@ -51,7 +53,18 @@ grails.project.dependency.resolution = {
         runtime ":gremlin-groovy:2.2.0-SNAPSHOT"
         //build "org.springframework.data:spring-mongodb:1.2.0.RELEASE"
         build ":mongo:2.9.1"
-        build ":freemarker:1.0"
+//        build ":neo4j-graph-algo:1.8.2"
+//        build ":neo4j-kernel:1.8.2"
+//        build ":neo4j-graph-matching:1.8.2"
+//        build ":neo4j-cypher:1.8.2"
+//        build ":neo4j-cypher-dsl:1.9.M04"
+//        //build 'com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.3.2'
+//        build ('org.springframework.data:spring-data-neo4j:2.0.0.RELEASE'){
+//            excludes  "jmxtools"
+//            excludes "jms"
+//            excludes "jmxri"
+//        }
+        //build ":spring-data-neo4j:2.2.0.RELEASE"
         // runtime 'mysql:mysql-connector-java:5.1.20'
     }
 

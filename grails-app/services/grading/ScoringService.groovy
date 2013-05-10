@@ -31,19 +31,19 @@ class ScoringService {
             List<Integer> correctAnswers = questionCorrectAnswerMap.get(question.questionId)
             //questionCorrectAnswerMap.put(question.getQuestionId(), question.choices);
             if(question.choice1){
-                correctAnswers.add(1)
+                correctAnswers.add(0)
             }
             if(question.choice2){
-                correctAnswers.add(2)
+                correctAnswers.add(1)
             }
             if(question.choice3){
-                correctAnswers.add(3)
+                correctAnswers.add(2)
             }
             if(question.choice4){
-                correctAnswers.add(4)
+                correctAnswers.add(3)
             }
             if(question.choice5){
-                correctAnswers.add(5)
+                correctAnswers.add(4)
             }
         }
 
@@ -53,13 +53,16 @@ class ScoringService {
             answerSheet.evaluated = true
             mongoTemplate.save(answerSheet, mongoCollectionFactoryService.getAnswerCollName())
             User user = User.findById(answerSheet.candidateId)
-            String htmlReport = reportingService.createReport(companyId,user,answerSheet)
-            CandidateReport candidateReport = reportingService.findCandidateReport(answerSheet.authKey)
+            String htmlReport = reportingService.createReport(companyId,user,questionPaper,answerSheet)
+            CandidateReport candidateReport
+            //= reportingService.findCandidateReport(answerSheet.authKey)
             if (!candidateReport){
                 candidateReport = new CandidateReport()
             }
             candidateReport.authKey = answerSheet.authKey
             candidateReport.candidateId = answerSheet.candidateId
+            candidateReport.questionPaperId = questionPaperId
+            candidateReport.customerId = companyId
             candidateReport.htmlReport = htmlReport
             mongoTemplate.save(candidateReport, mongoCollectionFactoryService.getReportsCollName())
         }

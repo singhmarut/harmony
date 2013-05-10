@@ -62,7 +62,16 @@ class QuestionPaperController {
         Subject currentUser = SecurityUtils.getSubject()
         long userId = currentUser.getSession().getAttribute("userId")
         questionPaperService.createQuestionPaper(paper,userId)
-        render view: "createSections"
+        response.setStatus(200)
+        render ''
+    }
+
+    def getPaper(){
+        Subject currentUser = SecurityUtils.getSubject()
+        long userId = currentUser.getSession().getAttribute("userId")
+        questionPaperService.findById(userId,params['questionPaperId'] as long)
+        response.setStatus(200)
+        render(view: 'createQuestionPaper')
     }
 
     def submitTest(){
@@ -76,7 +85,9 @@ class QuestionPaperController {
         //userId = 1
         testKeyGeneratorService.finishTest(authKey,1 ,json)
         //Test done leave the session
-        //subject.logout()
+        subject.logout()
+        render ''
+
     }
 
     @RequiresRoles("ROLE_ADMIN")
@@ -91,13 +102,15 @@ class QuestionPaperController {
         Subject subject = SecurityUtils.subject
         def userId = subject.getSession().getAttribute("userId")
         render testKeyGeneratorService.getValidKeysForTest(userId,questionPaperId) as JSON
-
-        //response.addHeader("redirect")
-        //redirect(view: "authKeys", model: [questionPaperId: params['questionPaperId']])
     }
 
     def showAuthKeys(long questionPaperId){
         render view: "authKeys", model: [questionPaperId: questionPaperId]
+    }
+
+    def showSuccess(){
+      render view: "success"
+
     }
 
     def startScoring(long questionPaperId){

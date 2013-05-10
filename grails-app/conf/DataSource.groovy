@@ -13,8 +13,17 @@ hibernate {
 environments {
     development {
         dataSource {
+//            username = "root"
+//            password = "admin"
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://localhost/adaptiveTester"
+        }
+        grails {
+            neo4j {
+                type = "embedded"
+                location = "/usr/local/harmony/data/neo4j"
+                params = []
+            }
         }
     }
     test {
@@ -26,7 +35,9 @@ environments {
     production {
         dataSource {
             dbCreate = "update"
-            url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+            url = "jdbc:mysql://localhost/harmony"
+            username = "root"
+            password = "admin123"
             pooled = true
             properties {
                maxActive = -1

@@ -109,30 +109,15 @@
                             valueField:'text',
                             textField:'text',
                             panelHeight:'auto',
-                            editable:false
+                            editable:true
                         } }},
                         {field:'questionCount',title:'Question Count',width:100,align:'right',editor:{type:'numberbox'}},
-                        {field:'difficulty',title:'Difficulty',width:120,align:'right',editor:{type:'numberbox'}},
+                        {field:'difficulty',title:'Difficulty (1-10)',width:120,align:'right',editor:{type:'numberbox'}},
                         {field:'action',title:'Compulsory Questions',width:150,align:'center',
                             formatter:function(value,row,index){
                                 var e = '<a href="#" onclick="showQuestions(this)">Select Questions</a> ';
                                 //var d = '<a href="#" onclick="deleterow(this)">Delete</a>';
                                 return e;
-                            }
-                        },
-                        {field:'saveaction',title:'Action',width:70,align:'center',
-                            formatter:function(value,row,index){
-                                //if (row.editing)
-                                //{
-                                //$(x).datagrid('endEdit', index);
-                                var e = '<a href="#" onclick= saveRow(\'' + x + '\')">Save</a> ';
-                                return e;
-
-//                                } else {
-//                                    var e = '<a href="#" onclick="editrow(this)">Edit</a> ';
-//                                    var d = '<a href="#" onclick="deleterow(this)">Delete</a>';
-//                                    return e+d;
-//                                }
                             }
                         }
                     ]],
@@ -155,13 +140,23 @@
                 });
             }
 
+
             $('#addNewSection').bind('click', function(e){
+                $('#sectionNameDlg').dialog('open');
+            })
+
+            $('#closeSectioNameDlg').bind('click', function(e){
+                $('#sectionNameDlg').dialog('close');
+            })
+
+            $('#addNewSectionName').bind('click', function(e){
                 var index =0;
-                var sectionName = $('#sectionName').val();
+                var sectionName = $('#idSectionName').val();
                 sectionList.push(sectionName);
                 index = sectionList.length;
                 var sectionId = "section" + index;
                 addNewSection(sectionId, sectionName);
+                $('#sectionNameDlg').dialog('close');
             })
 
             $('#generateKeys').bind('click', function(e){
@@ -197,6 +192,12 @@
             })
 
             $('#createPaper').bind('click', function(e){
+
+                for (var sId = 0; sId < sectionIds.length; sId++){
+                    var x = document.getElementById(sectionIds[sId]);
+                    accept(x);
+                }
+
                 var createUrl = "${createLink(controller: 'questionPaper', action: 'create')}";
 
                 var questionPaper = new Object();
@@ -220,7 +221,6 @@
                         section.duration = sectionInfo.duration;
                         section.instruction = sectionInfo.instruction;
                     }
-
 
                     for (var idx =0; idx < rows.length; idx++){
 
@@ -246,7 +246,13 @@
                     dataType: "json",
                     type: "POST",
                     data: {questionPaper: jsonQ}
+                }).success(function (data){
+                   var url = "${createLink(controller: 'questionPaper', action: 'showQuestionPapers')}"
+                   window.location.href = url;
                 })
+                .fail(function ( data ) {
+                        alert('Unable to create question paper. Please check your settings');
+                });
             })
 
             $('#tt').tree({
@@ -290,9 +296,9 @@
 <div class="easyui-panel" title="Create Question Paper" style="width:1200px;height:500px;padding:10px;">
     <div class="easyui-layout" data-options="fit:true">
 
-            <div data-options="region:'north'" style="height:50px;padding:10px">
+            <div data-options="region:'north'" style="height:60px;">
                 <div>
-                    <label style="padding-left: 10px;padding-right: 10px">Question Paper Title</label>
+                    <label style="padding-left: 10px;padding-right: 10px">Title</label>
                     <input type="text" id="paperTitle"/>
                     <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" id="createPaper">Create Question Paper</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" id="addNewSection">Add New Section</a>
@@ -322,7 +328,7 @@
             </div>
         </div>
         <div data-options="region:'center'" style="padding:10px" id="questionSections">
-            <label>Section Name</label> <input id="sectionName" style="width:200px"/>
+            <label><b>Question Paper Template</b></label>
         </div>
     </div>
 </div>
@@ -340,6 +346,18 @@
     <label>Section Instructions</label>
     <textarea rows="15" cols="40" id="sectionInstruction" title="Section Instructions">
     </textarea>
+</div>
+
+
+<div id="sectionNameDlg" class="easyui-dialog" title="Add New Section"
+     data-options="iconCls:'icon-save',modal:true,resizable:true,closed:true, buttons:[{
+                    text:'OK',
+                    id: 'addNewSectionName'
+                    },{
+                    text:'Cancel',
+                    id: 'closeSectioNameDlg'
+                    }]" style="width:400px;height:400px;padding:10px;">
+    <label>Section Name<input type="text" id="idSectionName"/> </label>
 </div>
 
 </body>

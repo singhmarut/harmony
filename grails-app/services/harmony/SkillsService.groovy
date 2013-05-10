@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 
 class SkillsService {
 
-    def hyperService
+    def neo4JService
     def mongoCollectionFactoryService
 
     def mongoTemplate
@@ -25,22 +25,22 @@ class SkillsService {
 
     List<SubjectTag> getAllSubjects(String company, int depth){
         Company company1 = Company.findByShortName(company)
-        return hyperService.getTopLevelSubjects(depth)
+        return neo4JService.getTopLevelSubjects(depth)
     }
 
     List<SubjectTag> getSubjects(long companyId){
         Company company1 = Company.findByShortName(companyId)
-        return hyperService.getAllSubjects(companyId)
+        return neo4JService.getAllSubjects(companyId)
     }
 
     List<SubjectTag> getChildrenSubjects(String company,long startNode){
         Company company1 = Company.findByShortName(company)
 
-        return hyperService.getSubjectsTillDepth(1,startNode,1)
+        return neo4JService.getSubjectsTillDepth(1,startNode,1)
     }
 
     def createNewSubject(String subject,String parentSubject){
-        hyperService.createSkill(1,subject,parentSubject)
+        neo4JService.createSkill(1,subject,parentSubject)
     }
 
     def serviceMethod() {

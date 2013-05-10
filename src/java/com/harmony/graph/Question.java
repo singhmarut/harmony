@@ -33,6 +33,7 @@ public class Question{
     //Who uploaded this question
     Long userId;
     List<String> tags;
+    String subjectName;
 
     public String getText() {
         return text;
@@ -178,5 +179,11 @@ public class Question{
         this.questionId = questionId;
     }
 
+    public String getSubjectName() {
+        return subjectName;
+    }
 
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
 }

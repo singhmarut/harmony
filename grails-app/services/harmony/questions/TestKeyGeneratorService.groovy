@@ -113,20 +113,19 @@ class TestKeyGeneratorService {
         AnswerSheet answerSheet = new AnswerSheet()
         QuestionPaper  questionPaper = findQuestionPaper(authKey)
         answerSheet.authKey = authKey
-        answerSheet.candidateId = userId
+        answerSheet.candidateId = testKey.getCandidateId()
         answerSheet.companyId = testKey.getCustomerId()
         answerSheet.questionPaperId = testKey.questionPaperId
         answerSheet.testStatus = TestStatus.FINISHED
         List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>()
         for (def questionResponse in response){
             QuestionResponse qResponse = new QuestionResponse()
-            qResponse.answers = questionResponse['answers']
-            qResponse.questionId = questionResponse['questionId']
+            qResponse.answers = questionResponse.value['answers']
+            qResponse.questionId = questionResponse.value['questionId']
             questionResponses.add(qResponse)
         }
         answerSheet.candidateAnswers = questionResponses
         String coll = mongoCollectionFactoryService.getAnswerCollName(testKey.getCustomerId())
         mongoTemplate.save(answerSheet, coll)
-
     }
 }

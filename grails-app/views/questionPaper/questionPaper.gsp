@@ -27,7 +27,7 @@
         $(document).ready(function() {
             var questionUrl = "${createLink(controller: 'questionPaper', action: 'getQuestionsForPaper')}";
             var submitUrl = "${createLink(controller: 'questionPaper', action: 'submitTest')}";
-            var questionResponseArray = new Array();
+            var questionResponseArray = new Object();
             var response = new Object();
             //Array of question for current section
             var questionArray;
@@ -47,7 +47,8 @@
                 e.preventDefault();
                 $(this).tab('show');
                 showSection(sectionId);
-                showQuestion(sectionId, 1);
+                curId = 1;
+                showQuestion(sectionId, curId);
             })
 
             $("body").on('click','.option', function(event) {
@@ -56,16 +57,18 @@
                 var questionId = optionPair[1] - 1;
                 var optionId = optionPair[2];
                 var questionResponse
+                var qid = questionArray[curId - 1].questionId;
+
                // if(questionResponse.)
-                questionResponse = questionResponseArray[questionId];
+                questionResponse = questionResponseArray[qid];
                 if(typeof(questionResponse) != 'undefined' && questionResponse != null)
                 {
 
                 }else{
                     questionResponse = new Object();
                     questionResponse.answers = new Array();
-                    questionResponseArray[questionId] = questionResponse;
-                    questionResponse.questionId = questionId;
+                    questionResponseArray[qid] = questionResponse;
+                    questionResponse.questionId = qid;
                 }
 
                 var checked = $(event.target).val();
@@ -111,7 +114,7 @@
 
                 questionArray = sectionArray[sectionId].sectionQuestions;
                 var question = questionArray[curId - 1];
-                var questionResponse = questionResponseArray[curId-1];
+                var questionResponse = questionResponseArray[question.questionId];
 
                 var content = '<p>' + question.text +  '</p>'
                 $('#questionArea').empty();
@@ -224,8 +227,11 @@
                 $.ajax({
                     url: submitUrl,
                     type: "POST",
-                    async:false,
+                    async:true,
                     data: {response: JSON.stringify(questionResponseArray)}
+                }).done(function(data){
+                    var successUrl = "${createLink(controller: 'questionPaper', action: 'showSuccess')}"
+                    window.location.href = successUrl;
                 })
             });
         })

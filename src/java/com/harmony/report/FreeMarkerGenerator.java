@@ -18,7 +18,7 @@ public class FreeMarkerGenerator {
     public String generateReport(Map templateValues){
         String finalReport = "";
         try{
-            File templateFile=new File("../ftl/candidateReport.ftl");
+            File templateFile=new File("ftl/candidateReport.ftl");
             Configuration cfg = new Configuration();
             cfg.setDirectoryForTemplateLoading(templateFile.getParentFile());
             Template template = cfg.getTemplate(templateFile.getName());

@@ -23,23 +23,62 @@ class QuestionPaperService {
 
     def createQuestionPaper(QuestionPaper questionPaper,long customerId){
 
-        //todo: get company Id from session
-        questionPaper.companyId = customerId
-        questionPaper.questionPaperId = mongoCollectionFactoryService.increaseQuestionPaperCounter()
-        List<Section> sectionList = questionPaper.getSectionList()
-        for (Section section in sectionList){
-            for (SectionSubject sectionSubject in section.getSectionSubjects()){
-                SubjectTag findSubject = skillsService.findSubjectByName(questionPaper.companyId, sectionSubject.subjectName)
-                sectionSubject.subjectTagId = findSubject.getSkillId()
-                List<Question> questions = hyperService.getQuestions(findSubject.subjectName, questionPaper.companyId)
-                List<Long> questionIds = new ArrayList<Long>()
-                for (Question question : questions){
-                    questionIds.add(question.questionId)
+        List<String> errors = validateQuestionPaper(questionPaper)
+        if (!errors.size()){
+            questionPaper.companyId = customerId
+            questionPaper.questionPaperId = mongoCollectionFactoryService.increaseQuestionPaperCounter()
+            List<Section> sectionList = questionPaper.getSectionList()
+            Set<Long> questionIdSet = new HashSet<Long>()
+
+            for (Section section in sectionList){
+                List<String> subjectNames = new ArrayList<String>()
+                for (SectionSubject sectionSubject in section.getSectionSubjects()){
+                    subjectNames.add(sectionSubject.getSubjectName())
                 }
-                sectionSubject.questionsIds = questionIds
+                hyperService.getQuestions(subjectNames, customerId)
+//                for (SectionSubject sectionSubject in section.getSectionSubjects()){
+//                    SubjectTag findSubject = skillsService.findSubjectByName(questionPaper.companyId, sectionSubject.subjectName)
+//                    sectionSubject.subjectTagId = findSubject.getSkillId()
+//
+//                    List<Question> questions = hyperService.getQuestions(findSubject.subjectName, questionPaper.companyId)
+//                    int subjectQuestionCount = sectionSubject.getQuestionCount()
+//                    int difficulty = sectionSubject.getDifficultyLevel()
+//                    List<Long> questionIds = new ArrayList<Long>()
+//
+//                    for (Question question : questions){
+//                        //Make sure only unique questions are picked up
+//                        if (!questionIdSet.contains(question.questionId)){
+//                            if ((question.getDifficultyLevel() == difficulty) && (questionIds.size() < subjectQuestionCount)){
+//                                questionIds.add(question.questionId)
+//                                questionIdSet.add(question.questionId)
+//                            }
+//                        }
+//                    }
+//                    sectionSubject.questionsIds = questionIds
+//                }
+            }
+            mongoTemplate.save(questionPaper, mongoCollectionFactoryService.getQuestionPaperCollName(questionPaper.companyId))
+        }
+    }
+
+    def validateQuestionPaper(QuestionPaper questionPaper){
+        List<String> errors = new ArrayList<String>()
+        List<Section> sectionList = questionPaper.getSectionList()
+        Set<String> sections = new HashSet<String>();
+        for (Section section in sectionList){
+            if (sections.contains(section.getSectionName())){
+                errors.add(String.format("Section %s is duplicate", section.getSectionName()))
             }
         }
-        mongoTemplate.save(questionPaper, mongoCollectionFactoryService.getQuestionPaperCollName(questionPaper.companyId))
+        for (Section section in sectionList){
+            Set<String> subjects = new HashSet<String>();
+            for (SectionSubject sectionSubject in section.getSectionSubjects()){
+                if (subjects.contains(sectionSubject.subjectName)){
+                    errors.add(String.format("Subject %s is duplicate", sectionSubject.subjectName))
+                }
+            }
+        }
+        return errors
     }
 
     def createDummyQuestionPaper(){

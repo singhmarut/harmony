@@ -31,6 +31,10 @@ import org.hypergraphdb.algorithms.SimpleALGenerator
 import org.hypergraphdb.algorithms.HGDepthFirstTraversal
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
+import org.hypergraphdb.HGLink
+import org.hypergraphdb.HGPlainLink
+import org.hypergraphdb.query.DFSCondition
+import org.hypergraphdb.indexing.ByPartIndexer
 
 class HyperService {
 
@@ -273,7 +277,7 @@ class HyperService {
                 HyperGraph graph = getGraph(companyId)
                 //Save question in graph
                 HGHandle questionHandle = graph.add(question)
-
+                //graph.getIndexManager().register(new ByPartIndexer(questionHand))
                 //For now assumption is that there is only one subject for one question
                 //There can be many tags which will be used for Questions finding
                 for(String tag in question.tags){
@@ -292,8 +296,68 @@ class HyperService {
 
     }
 
+    List<Question> getQuestions(Map<String,Long> subjectTag, long companyId){
+        Set<String> subjectMap = new HashSet<String>()
+        subjectMap.addAll(subjectTag)
+        List<Question> questions = new ArrayList<Question>()
+
+        org.hypergraphdb.query.Or orQuery
+        for (String subject : subjectTag.keySet()){
+            HGHandle startNode = findVertex(subject, companyId)
+            org.hypergraphdb.query.DFSCondition dfsCondition = new DFSCondition(startNode)
+            orQuery = dfsCondition
+        }
+
+        for (String subject : subjectTag){
+            HGHandle startNode = findVertex(subject, companyId)
+
+            if (!startNode){
+                log.error("Unable to find skill " + subjectTag)
+                return questions
+            }
+            try {
+                HyperGraph graph = getGraph(companyId)
+                DefaultALGenerator algen = new DefaultALGenerator(graph,
+                        null,
+                        hg.not(hg.or(hg.dfs())),
+                        false,
+                        true,
+                        false);
+                SimpleALGenerator simpleGenerator = new SimpleALGenerator(graph)
+                HGTraversal traversal = new HGDepthFirstTraversal(startNode, algen);
+
+                //SubjectTag currentArticle = startingArticle;
+                while (traversal.hasNext())
+                {
+                    Pair<HGHandle, HGHandle> next = traversal.next();
+                    def a = graph.get(next.first)
+                    HGLink hgLink;
+                    def b = graph.get(next.second)
+                    if (graph.get(next.getFirst()) instanceof SubjectLink){
+                        SubjectTag findSubject = graph.get(next.getSecond())
+                        String findSubjectName = findSubject.subjectName
+                        if (subjectMap.contains(findSubjectName)){
+
+                        }
+                    }
+                    if (graph.get(next.getFirst()) instanceof QuestionLink){
+
+                        HGLink l = (HGLink)graph.get(next.getFirst());
+
+                        Question nextQuestion = graph.get(next.getSecond());
+                        questions.add(nextQuestion)
+                    }
+                }
+            } finally {
+                //db.close();
+            }
+        }
+        return questions
+
+    }
+
     List<Question> getQuestions(String subjectTag, long companyId){
-        //todo: make sure only owner of the questions should be able to see the questions
+
         List<Question> questions = new ArrayList<Question>()
         HGHandle startNode = findVertex(subjectTag, companyId)
         if (!startNode){
@@ -324,7 +388,7 @@ class HyperService {
     }
 
     List<Question> getQuestions(long companyId,long subjectTag){
-        //todo: make sure only owner of the questions should be able to see the questions
+
         List<Question> questions = new ArrayList<Question>()
         HGHandle startNode = findVertex(subjectTag, companyId)
         HyperGraph graph = getGraph(companyId)
