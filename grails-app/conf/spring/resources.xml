@@ -23,7 +23,7 @@
     </bean>
     <!--<import resource="neo4JContext.xml"/>-->
 
-    <neo4j:config storeDirectory="harmony/data/graph.db"/>
+    <!--<neo4j:config storeDirectory="harmony/data/graph.db"/>-->
     <!--<neo4j:repositories base-package="harmony"/>-->
     <!--<bean id="template" class="org.springframework.data."-->
 </beans>

@@ -200,10 +200,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DataSource.groovy" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DataSource.groovy" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="52" selection-start="1639" selection-end="1639" vertical-scroll-proportion="0.8682284">
+            <state line="13" column="40" selection-start="358" selection-end="358" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -272,10 +272,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="resources.xml" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="resources.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/grails-app/conf/spring/resources.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="50" selection-start="1429" selection-end="1429" vertical-scroll-proportion="0.0">
+            <state line="25" column="4" selection-start="1438" selection-end="1492" vertical-scroll-proportion="0.5597015">
               <folding />
             </state>
           </provider>
@@ -314,8 +314,8 @@
         <option value="$PROJECT_DIR$/grails-app/conf/BuildConfig.groovy" />
         <option value="$PROJECT_DIR$/grails-app/domain/harmony/graph/HarmonySkill.groovy" />
         <option value="$PROJECT_DIR$/grails-app/services/com/prospecthire/graphdb/Neo4JService.groovy" />
-        <option value="$PROJECT_DIR$/grails-app/conf/spring/resources.xml" />
         <option value="$PROJECT_DIR$/grails-app/conf/DataSource.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/conf/spring/resources.xml" />
       </list>
     </option>
   </component>
@@ -1020,21 +1020,21 @@
         <state />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="40" selection-start="358" selection-end="358" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/conf/spring/resources.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="50" selection-start="1429" selection-end="1429" vertical-scroll-proportion="0.0">
+        <state line="25" column="4" selection-start="1438" selection-end="1492" vertical-scroll-proportion="0.5597015">
           <folding />
         </state>
       </provider>
       <provider editor-type-id="com.intellij.spring.perspectives.SpringBeansStructureEditorProvider">
         <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="52" selection-start="1639" selection-end="1639" vertical-scroll-proportion="0.8682284">
-          <folding />
-        </state>
       </provider>
     </entry>
   </component>
