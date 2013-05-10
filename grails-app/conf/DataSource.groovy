@@ -50,5 +50,12 @@ environments {
                validationQuery="SELECT 1"
             }
         }
+        grails {
+            neo4j {
+                type = "embedded"
+                location = "/home/marut/harmony/data"
+                params = []
+            }
+        }
     }
 }

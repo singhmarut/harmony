@@ -200,10 +200,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DataSource.groovy" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="DataSource.groovy" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="29" selection-start="705" selection-end="705" vertical-scroll-proportion="0.0">
+            <state line="55" column="52" selection-start="1639" selection-end="1639" vertical-scroll-proportion="0.8682284">
               <folding />
             </state>
           </provider>
@@ -272,10 +272,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="resources.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="resources.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/conf/spring/resources.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="27" selection-start="1324" selection-end="1324" vertical-scroll-proportion="0.47014925">
+            <state line="24" column="50" selection-start="1429" selection-end="1429" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -312,10 +312,10 @@
         <option value="$PROJECT_DIR$/grails-app/conf/spring/neo4JContext.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/grails-app/conf/BuildConfig.groovy" />
-        <option value="$PROJECT_DIR$/grails-app/conf/DataSource.groovy" />
         <option value="$PROJECT_DIR$/grails-app/domain/harmony/graph/HarmonySkill.groovy" />
         <option value="$PROJECT_DIR$/grails-app/services/com/prospecthire/graphdb/Neo4JService.groovy" />
         <option value="$PROJECT_DIR$/grails-app/conf/spring/resources.xml" />
+        <option value="$PROJECT_DIR$/grails-app/conf/DataSource.groovy" />
       </list>
     </option>
   </component>
@@ -850,7 +850,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1440" height="874" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297414" sideWeight="0.6712329" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -860,7 +860,7 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18219177" sideWeight="0.6386494" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28767124" sideWeight="0.35632184" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Grails View" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3297414" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Grails View" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3297414" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18318966" sideWeight="0.20273973" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -972,11 +972,6 @@
         <state line="5" column="17" selection-start="159" selection-end="159" vertical-scroll-proportion="0.093023255" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="29" selection-start="705" selection-end="705" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/services/com/prospecthire/graphdb/Neo4JService.groovy">
       <provider selected="true" editor-type-id="text-editor">
         <state line="106" column="19" selection-start="3854" selection-end="3854" vertical-scroll-proportion="0.0" />
@@ -1027,12 +1022,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/conf/spring/resources.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="27" selection-start="1324" selection-end="1324" vertical-scroll-proportion="0.47014925">
+        <state line="24" column="50" selection-start="1429" selection-end="1429" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
       <provider editor-type-id="com.intellij.spring.perspectives.SpringBeansStructureEditorProvider">
         <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="55" column="52" selection-start="1639" selection-end="1639" vertical-scroll-proportion="0.8682284">
+          <folding />
+        </state>
       </provider>
     </entry>
   </component>
